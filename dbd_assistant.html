@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>DBD-Assistent</title>
+
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #151f32;
+      --panel-soft: #1b2740;
+      --panel-deep: #07101f;
+
+      --text: #e5e7eb;
+      --text-soft: #cbd5e1;
+      --muted: #94a3b8;
+
+      --accent: #dddc00;
+      --accent-soft: rgba(221, 220, 0, 0.14);
+
+      --blue: #38bdf8;
+      --blue-soft: rgba(56, 189, 248, 0.14);
+
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.13);
+
+      --orange: #fb923c;
+      --orange-soft: rgba(251, 146, 60, 0.16);
+
+      --purple: #c084fc;
+      --purple-soft: rgba(192, 132, 252, 0.15);
+
+      --yellow: #fde047;
+      --yellow-soft: rgba(253, 224, 71, 0.15);
+
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.13);
+
+      --warning: #7f1d1d;
+      --warning-soft: rgba(127, 29, 29, 0.42);
+
+      --border: rgba(148, 163, 184, 0.16);
+      --border-strong: rgba(148, 163, 184, 0.28);
+
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.34);
+      --radius: 16px;
+
+      --ui: "Segoe UI", Arial, Helvetica, sans-serif;
+      --mono: "Cascadia Code", Consolas, "Lucida Console", "Courier New", monospace;
+      --logo-font: "Lucida Console", "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--ui);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(221, 220, 0, 0.06), transparent 30%),
+        linear-gradient(135deg, #070d19, var(--bg));
+      color: var(--text);
+      padding: 14px;
+    }
+
+    .app {
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      background: rgba(21, 31, 50, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 270px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(221, 220, 0, 0.16), transparent),
+        var(--panel-deep);
+      color: var(--accent);
+      border: 1px solid rgba(221, 220, 0, 0.48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--logo-font);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      user-select: none;
+      box-shadow:
+        inset 0 0 16px rgba(221, 220, 0, 0.08),
+        0 0 20px rgba(221, 220, 0, 0.06);
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -0.04em;
+      color: #f8fafc;
+    }
+
+    .title p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .right-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .privacy-timer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 11px;
+      background: var(--panel-deep);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+
+    .privacy-timer strong {
+      min-width: 48px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .privacy-timer.danger {
+      background: var(--warning-soft);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fecaca;
+      animation: timerBlink 1s infinite;
+    }
+
+    .privacy-timer.danger strong {
+      color: #fecaca;
+    }
+
+    @keyframes timerBlink {
+      0% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+      50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.42); }
+      100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .status {
+      width: 330px;
+      flex: 0 0 330px;
+      padding: 8px 11px;
+      border-radius: 11px;
+      background: var(--panel-deep);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--mono);
+    }
+
+    .status.success {
+      color: #bbf7d0;
+      background: var(--green-soft);
+      border-color: rgba(34, 197, 94, 0.34);
+    }
+
+    .status.warning {
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.13);
+      border-color: rgba(245, 158, 11, 0.30);
+    }
+
+    .status.error {
+      color: #fecaca;
+      background: var(--red-soft);
+      border-color: rgba(239, 68, 68, 0.30);
+    }
+
+    .ticker-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 10px;
+    }
+
+    .reminder-ticker {
+      grid-column: span 3;
+      min-height: 48px;
+      border-radius: 11px;
+      overflow: hidden;
+      background: rgba(7, 16, 31, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      position: relative;
+      min-width: 0;
+    }
+
+    .ticker-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 14px;
+      font-family: var(--mono);
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .ticker-text strong {
+      color: var(--accent);
+    }
+
+    .reminder-ticker.active {
+      border-color: rgba(221, 220, 0, 0.24);
+      color: var(--text);
+    }
+
+    .reminder-ticker.active .ticker-text {
+      padding-left: 100%;
+      animation: tickerMove 55s linear forwards;
+    }
+
+    @keyframes tickerMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+
+    .alpha-card {
+      grid-column: span 1;
+      min-height: 48px;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(80px, 1fr) auto auto;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 11px;
+      background: rgba(21, 31, 50, 0.82);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .alpha-label {
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      gap: 10px;
+      align-items: start;
+    }
+
+    .column {
+      background: rgba(21, 31, 50, 0.94);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      min-height: 100%;
+    }
+
+    .column:hover {
+      border-color: var(--border-strong);
+      background: rgba(27, 39, 64, 0.95);
+    }
+
+    .column-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .column-title h2 {
+      margin: 0;
+      font-size: 17px;
+      color: #f8fafc;
+      letter-spacing: -0.03em;
+    }
+
+    .btn-undo {
+      width: 34px;
+      height: 32px;
+      padding: 0;
+      border-radius: 10px;
+      background: var(--panel-deep);
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      font-size: 16px;
+    }
+
+    .btn-undo:disabled {
+      opacity: 0.33;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .number-input {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-deep);
+      color: #ffffff;
+      font-size: 20px;
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+      outline: none;
+      margin-bottom: 5px;
+    }
+
+    .number-input:focus {
+      border-color: rgba(221, 220, 0, 0.48);
+      box-shadow: 0 0 0 3px rgba(221, 220, 0, 0.08);
+    }
+
+    .number-input::placeholder {
+      color: rgba(148, 163, 184, 0.58);
+    }
+
+    .input-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .command-area {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .command-row {
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(7, 16, 31, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.10);
+    }
+
+    .command-row.tone-green {
+      background: rgba(20, 83, 45, 0.26);
+      border-color: rgba(34, 197, 94, 0.22);
+    }
+
+    .command-row.tone-orange {
+      background: rgba(154, 52, 18, 0.30);
+      border-color: rgba(251, 146, 60, 0.34);
+    }
+
+    .command-row.tone-purple {
+      background: rgba(88, 28, 135, 0.30);
+      border-color: rgba(192, 132, 252, 0.34);
+    }
+
+    .command-row.tone-blue {
+      background: rgba(12, 74, 110, 0.32);
+      border-color: rgba(56, 189, 248, 0.34);
+    }
+
+    .command-row.tone-yellow {
+      background: rgba(113, 63, 18, 0.32);
+      border-color: rgba(253, 224, 71, 0.34);
+    }
+
+    .command-row.tone-green .command-label { color: #bbf7d0; }
+    .command-row.tone-orange .command-label { color: #fed7aa; }
+    .command-row.tone-purple .command-label { color: #e9d5ff; }
+    .command-row.tone-blue .command-label { color: #bae6fd; }
+    .command-row.tone-yellow .command-label { color: #fef08a; }
+
+    .command-row.flash-green {
+      animation: commandFlashGreen 650ms ease-out 1;
+    }
+
+    .command-row.flash-orange {
+      animation: commandFlashOrange 750ms ease-out 1;
+    }
+
+    .command-row.flash-purple {
+      animation: commandFlashPurple 750ms ease-out 1;
+    }
+
+    .command-row.flash-blue {
+      animation: commandFlashBlue 750ms ease-out 1;
+    }
+
+    .command-row.flash-yellow {
+      animation: commandFlashYellow 750ms ease-out 1;
+    }
+
+    @keyframes commandFlashGreen {
+      0% { background: rgba(20, 83, 45, 0.26); }
+      25% {
+        background: rgba(20, 83, 45, 0.90);
+        border-color: rgba(34, 197, 94, 0.78);
+      }
+      100% { background: rgba(20, 83, 45, 0.26); }
+    }
+
+    @keyframes commandFlashOrange {
+      0% { background: rgba(154, 52, 18, 0.30); }
+      25% {
+        background: rgba(234, 88, 12, 0.95);
+        border-color: rgba(251, 146, 60, 0.92);
+      }
+      100% { background: rgba(154, 52, 18, 0.30); }
+    }
+
+    @keyframes commandFlashPurple {
+      0% { background: rgba(88, 28, 135, 0.30); }
+      25% {
+        background: rgba(126, 34, 206, 0.95);
+        border-color: rgba(192, 132, 252, 0.92);
+      }
+      100% { background: rgba(88, 28, 135, 0.30); }
+    }
+
+    @keyframes commandFlashBlue {
+      0% { background: rgba(12, 74, 110, 0.32); }
+      25% {
+        background: rgba(2, 132, 199, 0.95);
+        border-color: rgba(56, 189, 248, 0.92);
+      }
+      100% { background: rgba(12, 74, 110, 0.32); }
+    }
+
+    @keyframes commandFlashYellow {
+      0% { background: rgba(113, 63, 18, 0.32); }
+      25% {
+        background: rgba(202, 138, 4, 0.95);
+        border-color: rgba(253, 224, 71, 0.92);
+      }
+      100% { background: rgba(113, 63, 18, 0.32); }
+    }
+
+    .command-label {
+      margin-bottom: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-soft);
+      cursor: copy;
+      user-select: none;
+    }
+
+    .command-label:hover {
+      color: var(--accent);
+    }
+
+    .command-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 6px;
+    }
+
+    .command-output,
+    .alpha-output {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 9px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.13);
+      background: #020617;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 14px;
+      outline: none;
+      cursor: copy;
+    }
+
+    .command-output:focus,
+    .alpha-output:focus {
+      border-color: rgba(56, 189, 248, 0.38);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
+    }
+
+    .command-output::placeholder {
+      color: rgba(148, 163, 184, 0.32);
+    }
+
+    button {
+      border: none;
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition:
+        transform 0.08s ease,
+        background 0.15s ease,
+        border-color 0.15s ease,
+        opacity 0.15s ease;
+      white-space: nowrap;
+      font-family: var(--ui);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-copy {
+      background: var(--blue-soft);
+      color: #e0f2fe;
+      border: 1px solid rgba(56, 189, 248, 0.30);
+    }
+
+    .btn-copy:hover {
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    .btn-hd {
+      background: var(--accent-soft);
+      color: #fef9c3;
+      border: 1px solid rgba(221, 220, 0, 0.28);
+    }
+
+    .btn-hd:hover {
+      background: rgba(221, 220, 0, 0.20);
+    }
+
+    .btn-secondary {
+      background: var(--panel-deep);
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #0f1b30;
+    }
+
+    .btn-danger {
+      background: var(--red-soft);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.24);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.20);
+    }
+
+    .btn-timer {
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .btn-clear-inline {
+      color: #fee2e2;
+      background: rgba(127, 29, 29, 0.22);
+      border-color: rgba(239, 68, 68, 0.24);
+    }
+
+    .btn-clear-inline:hover {
+      background: rgba(127, 29, 29, 0.34);
+    }
+
+    .notes-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: stretch;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: rgba(21, 31, 50, 0.74);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .notes-panel textarea {
+      width: 100%;
+      min-height: 42px;
+      max-height: 120px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel-deep);
+      color: var(--text);
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.35;
+      outline: none;
+    }
+
+    .notes-panel textarea::placeholder {
+      color: rgba(148, 163, 184, 0.68);
+    }
+
+    .notes-panel textarea:focus {
+      border-color: rgba(56, 189, 248, 0.36);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
+    }
+
+    .notes-actions {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 260px;
+    }
+
+    .notes-actions button {
+      flex: 1 1 auto;
+      min-width: 86px;
+      padding: 7px 9px;
+    }
+
+    .footer {
+      margin-top: 10px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      border-radius: 14px;
+      background: rgba(7, 16, 31, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.10);
+    }
+
+    .footer strong {
+      color: var(--text-soft);
+      font-weight: 700;
+    }
+
+    .footer-stats {
+      margin-top: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-stats span span {
+      color: var(--accent);
+    }
+
+    .timer-link {
+      cursor: pointer;
+      border-bottom: 1px dashed rgba(221, 220, 0, 0.45);
+      padding-bottom: 1px;
+    }
+
+    .timer-link:hover {
+      color: #fef9c3;
+      border-bottom-color: #fef9c3;
+    }
+
+    @media (max-width: 1100px) {
+      .ticker-row {
+        grid-template-columns: 1fr;
+      }
+
+      .reminder-ticker,
+      .alpha-card {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(210px, 1fr));
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .right-tools {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 580px) {
+      body {
+        padding: 9px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .brand {
+        min-width: unset;
+      }
+
+      .command-controls {
+        grid-template-columns: 1fr auto auto;
+      }
+
+      .alpha-card {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        width: 100%;
+        flex: 1 1 100%;
+      }
+
+      .privacy-timer {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .notes-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .notes-actions {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">DBD</div>
+
+        <div class="title">
+          <h1>DBD-Assistent</h1>
+          <p>Effizientes Kopieren von Befehlen</p>
+        </div>
+      </div>
+
+      <div class="right-tools">
+        <div id="privacyTimerBox" class="privacy-timer">
+          <span>Auto-Clear</span>
+          <strong id="privacyTimer">05:00</strong>
+
+          <button
+            class="btn-timer"
+            onclick="resetPrivacyTimer()"
+            title="Timer wieder auf 5 Minuten setzen"
+          >
+            🔄
+          </button>
+
+          <button
+            class="btn-timer btn-clear-inline"
+            onclick="manualClearNumbers()"
+            title="Alle Nummern löschen. Notizen bleiben erhalten."
+          >
+            ♻️
+          </button>
+        </div>
+
+        <div id="status" class="status">
+          Status: Bereit.
+        </div>
+      </div>
+    </header>
+
+    <div class="ticker-row">
+      <section id="reminderTicker" class="reminder-ticker">
+        <div id="tickerText" class="ticker-text">
+          <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
+        </div>
+      </section>
+
+      <section class="alpha-card">
+        <div class="alpha-label">Alpha-Abfrage</div>
+
+        <input
+          id="alpha-command"
+          class="alpha-output"
+          value="70anz090"
+          readonly
+          ondblclick="copyStaticCommand('alpha-command', false)"
+          title="Doppelklick: Befehl kopieren"
+        />
+
+        <button
+          class="btn-copy"
+          onclick="copyStaticCommand('alpha-command', false)"
+          title="Befehl kopieren"
+        >
+          Copy
+        </button>
+
+        <button
+          class="btn-hd"
+          onclick="copyStaticCommand('alpha-command', true)"
+          title="Befehl mit hd am Anfang kopieren"
+        >
+          HD
+        </button>
+      </section>
+    </div>
+
+    <main id="grid" class="grid"></main>
+
+    <section class="notes-panel">
+      <textarea
+        id="notes"
+        placeholder="Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht."
+      ></textarea>
+
+      <div class="notes-actions">
+        <button class="btn-secondary" onclick="copyNotes()">📋 Notes</button>
+        <button class="btn-danger" onclick="clearNotes()">🧹 Clear</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.1
+
+      <div class="footer-stats">
+        <span>Online: <span id="onlineTime">00:00:00</span></span>
+        <span>
+          Nächste Erinnerung:
+          <span
+            id="nextReminderTime"
+            class="timer-link"
+            onclick="showReminder(false)"
+            title="Jetzt Erinnerung anzeigen"
+          >
+            02:00:00
+          </span>
+        </span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    /*
+      Основные настройки:
+      - Auto-Clear: 5 минут
+      - Напоминание: каждые 2 часа
+      - Заметки не очищаются автоматически
+      - Клиентские данные не сохраняются в localStorage/cookies/sessionStorage
+    */
+    const PRIVACY_TIMER_START = 5 * 60;
+    const REMINDER_INTERVAL = 2 * 60 * 60 * 1000;
+    const TICKER_ANIMATION_TIME = 55000;
+
+    const DEFAULT_TICKER_TEXT = "<strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren";
+
+    const columns = [
+      {
+        id: "depot",
+        title: "Depotnummer",
+        placeholder: "10 Zeichen",
+        commands: [
+          {
+            label: "Grundbefehl",
+            prefix: "90anz091",
+            tone: "green"
+          },
+
+          {
+            label: "Sperren anzeigen",
+            prefix: "11anz213"
+          },
+          {
+            label: "Sperre setzen",
+            prefix: "11neu213"
+          },
+          {
+            label: "Sperre löschen",
+            prefix: "11loe213",
+            tone: "orange"
+          },
+          {
+            label: "Sperre ändern",
+            prefix: "11aen213"
+          },
+
+          {
+            label: "Rollen (Person) anzeigen",
+            prefix: "10anz113",
+            tone: "purple"
+          },
+
+          {
+            label: "Hinweistexte anzeigen",
+            prefix: "10anz013"
+          },
+          {
+            label: "Hinweistexte ändern/löschen",
+            prefix: "10aen013",
+            tone: "blue"
+          },
+          {
+            label: "Hinweistexte setzen",
+            prefix: "10neu013"
+          },
+
+          {
+            label: "FSA Zukunft anzeigen",
+            prefix: "70anz040"
+          },
+          {
+            label: "FSA Vorjahr anzeigen",
+            prefix: "70anz042"
+          },
+
+          {
+            label: "Bankverbindung",
+            prefix: "10anz012"
+          }
+        ]
+      },
+      {
+        id: "pid1",
+        title: "PID 1",
+        placeholder: "10 Zeichen",
+        commands: [
+          {
+            label: "Personendaten anzeigen",
+            prefix: "70anz010"
+          },
+          {
+            label: "Personendaten ändern",
+            prefix: "70k  010",
+            tone: "yellow"
+          },
+          {
+            label: "Kontaktdaten",
+            prefix: "70anz060"
+          },
+          {
+            label: "AGB ETF",
+            prefix: "70anz080"
+          }
+        ]
+      },
+      {
+        id: "pid2",
+        title: "PID 2",
+        placeholder: "10 Zeichen",
+        commands: [
+          {
+            label: "Personendaten anzeigen",
+            prefix: "70anz010"
+          },
+          {
+            label: "Personendaten ändern",
+            prefix: "70k  010",
+            tone: "yellow"
+          },
+          {
+            label: "Kontaktdaten",
+            prefix: "70anz060"
+          },
+          {
+            label: "AGB ETF",
+            prefix: "70anz080"
+          }
+        ]
+      },
+      {
+        id: "pid3",
+        title: "PID 3",
+        placeholder: "10 Zeichen",
+        commands: [
+          {
+            label: "Personendaten anzeigen",
+            prefix: "70anz010"
+          },
+          {
+            label: "Personendaten ändern",
+            prefix: "70k  010",
+            tone: "yellow"
+          },
+          {
+            label: "Kontaktdaten",
+            prefix: "70anz060"
+          },
+          {
+            label: "AGB ETF",
+            prefix: "70anz080"
+          }
+        ]
+      }
+    ];
+
+    const grid = document.getElementById("grid");
+    const statusBox = document.getElementById("status");
+
+    const pageOpenedAt = Date.now();
+
+    let nextReminderAt = Date.now() + REMINDER_INTERVAL;
+    let privacySecondsLeft = PRIVACY_TIMER_START;
+    let privacyTimerInterval = null;
+    let reminderHideTimer = null;
+
+    /*
+      Undo хранит только одно предыдущее значение на столбец.
+      Это оперативная память текущей страницы, не постоянное хранилище.
+    */
+    const previousValues = {};
+
+    function createInterface() {
+      columns.forEach(column => {
+        previousValues[column.id] = null;
+
+        const columnElement = document.createElement("section");
+        columnElement.className = "column";
+        columnElement.dataset.columnId = column.id;
+
+        columnElement.innerHTML = `
+          <div class="column-header">
+            <div class="column-title">
+              <h2>${column.title}</h2>
+            </div>
+
+            <button
+              id="${column.id}-undo"
+              class="btn-undo"
+              onclick="undoColumn('${column.id}')"
+              title="Letzte Änderung zurücknehmen"
+              disabled
+            >
+              🔙
+            </button>
+          </div>
+
+          <input
+            id="${column.id}-input"
+            class="number-input"
+            maxlength="10"
+            placeholder="${column.placeholder}"
+            autocomplete="off"
+            spellcheck="false"
+          />
+
+          <div class="input-info">
+            <span>Max. 10 Zeichen</span>
+            <span id="${column.id}-counter">0 / 10</span>
+          </div>
+
+          <div class="command-area">
+            ${column.commands.map((command, index) => {
+              const toneClass = command.tone ? `tone-${command.tone}` : "";
+              const flashClass = command.flashClass || (command.tone ? `flash-${command.tone}` : "");
+
+              return `
+                <div
+                  class="command-row ${toneClass}"
+                  data-flash-class="${flashClass}"
+                >
+                  <div
+                    class="command-label"
+                    ondblclick="copyCommand('${column.id}-command-${index}', false)"
+                    title="Doppelklick: Befehl kopieren"
+                  >
+                    ${command.label}
+                  </div>
+
+                  <div class="command-controls">
+                    <input
+                      id="${column.id}-command-${index}"
+                      class="command-output"
+                      value=""
+                      placeholder="${command.prefix}..."
+                      readonly
+                      ondblclick="copyCommand('${column.id}-command-${index}', false)"
+                      title="Doppelklick: Befehl kopieren"
+                    />
+
+                    <button
+                      class="btn-copy"
+                      onclick="copyCommand('${column.id}-command-${index}', false)"
+                      title="Befehl kopieren"
+                    >
+                      Copy
+                    </button>
+
+                    <button
+                      class="btn-hd"
+                      onclick="copyCommand('${column.id}-command-${index}', true)"
+                      title="Befehl mit hd am Anfang kopieren"
+                    >
+                      HD
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+
+        grid.appendChild(columnElement);
+
+        const input = document.getElementById(`${column.id}-input`);
+
+        input.addEventListener("beforeinput", () => {
+          rememberPreviousValue(column.id, input.value);
+        });
+
+        input.addEventListener("input", () => {
+          input.value = cleanValue(input.value);
+          updateColumn(column);
+          silentlyResetPrivacyTimer();
+        });
+
+        input.addEventListener("focus", () => {
+          input.select();
+        });
+
+        input.addEventListener("click", () => {
+          input.select();
+        });
+      });
+    }
+
+    function getColumn(columnId) {
+      return columns.find(column => column.id === columnId);
+    }
+
+    function cleanValue(value) {
+      /*
+        Оставляем только первые 10 символов.
+        Пробелы по краям и переносы строк убираются.
+      */
+      return String(value || "").trim().slice(0, 10);
+    }
+
+    function rememberPreviousValue(columnId, oldValue) {
+      const currentValue = document.getElementById(`${columnId}-input`).value;
+
+      if (oldValue === currentValue && previousValues[columnId] !== null) {
+        return;
+      }
+
+      previousValues[columnId] = oldValue;
+      updateUndoButton(columnId);
+    }
+
+    function updateUndoButton(columnId) {
+      const button = document.getElementById(`${columnId}-undo`);
+
+      if (!button) {
+        return;
+      }
+
+      button.disabled = previousValues[columnId] === null;
+    }
+
+    function undoColumn(columnId) {
+      const oldValue = previousValues[columnId];
+
+      if (oldValue === null) {
+        setStatus("Kein Undo verfügbar.", "warning");
+        return;
+      }
+
+      const input = document.getElementById(`${columnId}-input`);
+      const column = getColumn(columnId);
+      const currentValue = input.value;
+
+      input.value = oldValue;
+      previousValues[columnId] = currentValue || null;
+
+      updateColumn(column);
+      updateUndoButton(columnId);
+      silentlyResetPrivacyTimer();
+
+      setStatus("Letzte Änderung rückgängig gemacht.", "success");
+    }
+
+    function updateColumn(column) {
+      const input = document.getElementById(`${column.id}-input`);
+      const counter = document.getElementById(`${column.id}-counter`);
+      const value = input.value.trim();
+
+      counter.textContent = `${value.length} / 10`;
+
+      column.commands.forEach((command, index) => {
+        const output = document.getElementById(`${column.id}-command-${index}`);
+
+        if (!value) {
+          output.value = "";
+          return;
+        }
+
+        output.value = `${command.prefix}${value}`;
+      });
+    }
+
+    async function copyText(text) {
+      if (!text) {
+        setStatus("Nichts zu kopieren.", "warning");
+        return false;
+      }
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          fallbackCopy(text);
+        }
+
+        setStatus(`Kopiert: ${text}`, "success");
+        return true;
+      } catch (error) {
+        try {
+          fallbackCopy(text);
+          setStatus(`Kopiert: ${text}`, "success");
+          return true;
+        } catch (fallbackError) {
+          setStatus("Kopieren fehlgeschlagen.", "error");
+          return false;
+        }
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+
+    async function copyCommand(elementId, withHD) {
+      const field = document.getElementById(elementId);
+      const baseCommand = field.value;
+
+      if (!baseCommand) {
+        setStatus("Erst Nummer einfügen.", "warning");
+        return;
+      }
+
+      const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
+      const copied = await copyText(finalCommand);
+
+      if (copied) {
+        flashCommandRow(field);
+        silentlyResetPrivacyTimer();
+      }
+    }
+
+    async function copyStaticCommand(elementId, withHD) {
+      const field = document.getElementById(elementId);
+      const baseCommand = field.value;
+
+      const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
+      await copyText(finalCommand);
+      silentlyResetPrivacyTimer();
+    }
+
+    function flashCommandRow(field) {
+      const row = field.closest(".command-row");
+
+      if (!row) {
+        return;
+      }
+
+      const flashClass = row.dataset.flashClass;
+
+      if (!flashClass) {
+        return;
+      }
+
+      row.classList.remove(flashClass);
+
+      /*
+        Небольшой reflow, чтобы повторное мигание запускалось каждый раз.
+      */
+      void row.offsetWidth;
+
+      row.classList.add(flashClass);
+
+      setTimeout(() => {
+        row.classList.remove(flashClass);
+      }, 800);
+    }
+
+    function copyNotes() {
+      const notes = document.getElementById("notes").value.trim();
+
+      if (!notes) {
+        setStatus("Keine Notizen vorhanden.", "warning");
+        return;
+      }
+
+      copyText(notes);
+    }
+
+    function clearNotes() {
+      document.getElementById("notes").value = "";
+      setStatus("Notizen gelöscht.", "warning");
+    }
+
+    function setStatus(message, type) {
+      statusBox.textContent = `Status: ${message}`;
+      statusBox.className = "status";
+
+      if (type) {
+        statusBox.classList.add(type);
+      }
+
+      setTimeout(() => {
+        statusBox.textContent = "Status: Bereit.";
+        statusBox.className = "status";
+      }, 3000);
+    }
+
+    function formatMinutesSeconds(seconds) {
+      const safeSeconds = Math.max(0, seconds);
+      const minutes = Math.floor(safeSeconds / 60);
+      const restSeconds = safeSeconds % 60;
+
+      return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
+    }
+
+    function formatHoursMinutesSeconds(milliseconds) {
+      const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function updatePrivacyTimerView() {
+      const timer = document.getElementById("privacyTimer");
+      const timerBox = document.getElementById("privacyTimerBox");
+
+      timer.textContent = formatMinutesSeconds(privacySecondsLeft);
+
+      if (privacySecondsLeft <= 60) {
+        timerBox.classList.add("danger");
+      } else {
+        timerBox.classList.remove("danger");
+      }
+    }
+
+    function startPrivacyTimer() {
+      clearInterval(privacyTimerInterval);
+      updatePrivacyTimerView();
+
+      privacyTimerInterval = setInterval(() => {
+        privacySecondsLeft--;
+        updatePrivacyTimerView();
+
+        if (privacySecondsLeft <= 0) {
+          clearInterval(privacyTimerInterval);
+          clearSensitiveData();
+          setStatus("Nummern automatisch gelöscht.", "warning");
+        }
+      }, 1000);
+    }
+
+    function resetPrivacyTimer() {
+      privacySecondsLeft = PRIVACY_TIMER_START;
+      startPrivacyTimer();
+      setStatus("Timer zurückgesetzt.", "success");
+    }
+
+    function silentlyResetPrivacyTimer() {
+      privacySecondsLeft = PRIVACY_TIMER_START;
+      startPrivacyTimer();
+    }
+
+    function clearSensitiveData() {
+      /*
+        Заметки не очищаются.
+        Очищаются только номера, команды и временный Undo-буфер.
+      */
+      document.querySelectorAll(".number-input").forEach(input => {
+        input.value = "";
+      });
+
+      Object.keys(previousValues).forEach(columnId => {
+        previousValues[columnId] = null;
+        updateUndoButton(columnId);
+      });
+
+      columns.forEach(column => {
+        updateColumn(column);
+      });
+
+      privacySecondsLeft = PRIVACY_TIMER_START;
+      startPrivacyTimer();
+    }
+
+    function manualClearNumbers() {
+      clearSensitiveData();
+      setStatus("Nummern gelöscht. Notizen bleiben erhalten.", "warning");
+    }
+
+    const reminderMessages = [
+      {
+        title: "Wasserpause",
+        text: "Ein paar Schlucke Wasser. Danach weiter."
+      },
+      {
+        title: "Kurze Bewegung",
+        text: "Schultern lockern, Nacken bewegen, einmal tief durchatmen."
+      },
+      {
+        title: "Augenpause",
+        text: "20 Sekunden in die Ferne schauen."
+      },
+      {
+        title: "Mini-Pause",
+        text: "Kurz aufrichten. Dann weiter kopieren."
+      }
+    ];
+
+    function showReminder(isAutomatic = true) {
+      const ticker = document.getElementById("reminderTicker");
+      const tickerText = document.getElementById("tickerText");
+
+      const randomMessage = reminderMessages[
+        Math.floor(Math.random() * reminderMessages.length)
+      ];
+
+      clearTimeout(reminderHideTimer);
+
+      ticker.classList.add("active");
+      tickerText.innerHTML = `<strong>${randomMessage.title}:</strong> ${randomMessage.text}`;
+      tickerText.style.animation = "none";
+
+      /*
+        Небольшой reflow, чтобы анимация бегущей строки запускалась заново.
+      */
+      void tickerText.offsetWidth;
+
+      tickerText.style.animation = `tickerMove ${TICKER_ANIMATION_TIME / 1000}s linear forwards`;
+
+      reminderHideTimer = setTimeout(() => {
+        ticker.classList.remove("active");
+        tickerText.style.animation = "none";
+        tickerText.innerHTML = DEFAULT_TICKER_TEXT;
+      }, TICKER_ANIMATION_TIME + 500);
+
+      if (isAutomatic) {
+        nextReminderAt = Date.now() + REMINDER_INTERVAL;
+      }
+    }
+
+    function updateFooterTimers() {
+      const onlineTime = document.getElementById("onlineTime");
+      const nextReminderTime = document.getElementById("nextReminderTime");
+
+      onlineTime.textContent = formatHoursMinutesSeconds(Date.now() - pageOpenedAt);
+      nextReminderTime.textContent = formatHoursMinutesSeconds(nextReminderAt - Date.now());
+
+      if (Date.now() >= nextReminderAt) {
+        showReminder(true);
+      }
+    }
+
+    function setCurrentYear() {
+      document.getElementById("currentYear").textContent = new Date().getFullYear();
+    }
+
+    createInterface();
+    startPrivacyTimer();
+    setCurrentYear();
+    updateFooterTimers();
+
+    setInterval(updateFooterTimers, 1000);
+  </script>
+</body>
+</html>
