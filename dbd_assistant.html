@@ -54,6 +54,12 @@
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -69,11 +75,12 @@
     .app {
       max-width: 1500px;
       margin: 0 auto;
+      min-width: 0;
     }
 
     .top-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       margin-bottom: 10px;
     }
@@ -86,11 +93,12 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       box-shadow: var(--shadow);
+      min-width: 0;
     }
 
     .topbar {
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
       gap: 14px;
     }
@@ -99,12 +107,13 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      min-width: 270px;
+      min-width: 0;
     }
 
     .logo {
       width: 50px;
       height: 50px;
+      flex: 0 0 50px;
       border-radius: 12px;
       background:
         linear-gradient(180deg, rgba(221, 220, 0, 0.16), transparent),
@@ -124,17 +133,27 @@
         0 0 20px rgba(221, 220, 0, 0.06);
     }
 
+    .title {
+      min-width: 0;
+    }
+
     .title h1 {
       margin: 0;
       font-size: 25px;
       letter-spacing: -0.04em;
       color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .title p {
       margin: 3px 0 0;
       color: var(--muted);
       font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .right-tools {
@@ -143,6 +162,7 @@
       justify-content: flex-end;
       gap: 8px;
       flex-wrap: wrap;
+      min-width: 0;
     }
 
     .privacy-timer {
@@ -157,6 +177,7 @@
       font-size: 13px;
       white-space: nowrap;
       font-family: var(--mono);
+      min-width: 0;
     }
 
     .privacy-timer strong {
@@ -207,13 +228,14 @@
 
     .notes-panel {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: stretch;
     }
 
     .notes-panel textarea {
       width: 100%;
+      min-width: 0;
       min-height: 54px;
       resize: vertical;
       border: 1px solid var(--border);
@@ -242,15 +264,16 @@
 
     .ticker-row {
       display: grid;
-      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       align-items: stretch;
       margin-bottom: 10px;
+      min-width: 0;
     }
 
     .status-ticker {
       grid-column: span 3;
-      min-height: 48px;
+      min-height: 72px;
       border-radius: 11px;
       overflow: hidden;
       background: rgba(7, 16, 31, 0.72);
@@ -289,24 +312,46 @@
 
     .alpha-card {
       grid-column: span 1;
-      min-height: 48px;
+      min-height: 72px;
       min-width: 0;
+      width: 100%;
+      max-width: 100%;
       display: grid;
-      grid-template-columns: auto minmax(80px, 1fr) auto auto;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        "label label label"
+        "output copy hd";
       align-items: center;
       gap: 6px;
-      padding: 6px;
+      padding: 8px;
       border-radius: 11px;
       background: rgba(21, 31, 50, 0.82);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
     .alpha-label {
+      grid-area: label;
       color: var(--text-soft);
       font-size: 12px;
       font-weight: 800;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .alpha-output {
+      grid-area: output;
+    }
+
+    .alpha-copy {
+      grid-area: copy;
+    }
+
+    .alpha-hd {
+      grid-area: hd;
     }
 
     .grid {
@@ -314,6 +359,7 @@
       grid-template-columns: repeat(4, minmax(210px, 1fr));
       gap: 10px;
       align-items: start;
+      min-width: 0;
     }
 
     .column {
@@ -323,6 +369,7 @@
       box-shadow: var(--shadow);
       padding: 10px;
       min-height: 100%;
+      min-width: 0;
     }
 
     .column:hover {
@@ -332,7 +379,7 @@
 
     .column-header {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
@@ -343,6 +390,9 @@
       font-size: 17px;
       color: #f8fafc;
       letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .btn-column-clear {
@@ -358,6 +408,7 @@
 
     .number-input {
       width: 100%;
+      min-width: 0;
       padding: 9px 10px;
       border-radius: 10px;
       border: 1px solid var(--border);
@@ -400,6 +451,7 @@
       border-radius: 12px;
       background: rgba(7, 16, 31, 0.45);
       border: 1px solid rgba(148, 163, 184, 0.10);
+      min-width: 0;
     }
 
     .command-row.tone-green {
@@ -515,6 +567,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 6px;
+      min-width: 0;
     }
 
     .command-output,
@@ -586,16 +639,6 @@
       background: rgba(221, 220, 0, 0.20);
     }
 
-    .btn-secondary {
-      background: var(--panel-deep);
-      color: var(--text-soft);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: #0f1b30;
-    }
-
     .btn-danger {
       background: var(--red-soft);
       color: #fecaca;
@@ -661,15 +704,22 @@
       }
 
       .brand {
-        min-width: unset;
+        min-width: 0;
+      }
+
+      .title h1 {
+        font-size: 22px;
       }
 
       .command-controls {
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: minmax(0, 1fr) auto auto;
       }
 
       .alpha-card {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas:
+          "label label label"
+          "output copy hd";
       }
 
       .privacy-timer {
@@ -679,6 +729,10 @@
 
       .notes-panel {
         grid-template-columns: 1fr;
+      }
+
+      .notes-actions {
+        justify-content: stretch;
       }
     }
   </style>
@@ -756,7 +810,7 @@
         />
 
         <button
-          class="btn-copy"
+          class="btn-copy alpha-copy"
           onclick="copyStaticCommand('alpha-command', false)"
           title="Befehl kopieren"
         >
@@ -764,7 +818,7 @@
         </button>
 
         <button
-          class="btn-hd"
+          class="btn-hd alpha-hd"
           onclick="copyStaticCommand('alpha-command', true)"
           title="Befehl mit hd am Anfang kopieren"
         >
