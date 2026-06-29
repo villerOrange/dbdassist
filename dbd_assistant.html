@@ -71,17 +71,28 @@
       margin: 0 auto;
     }
 
-    .topbar {
+    .top-layout {
       display: grid;
-      grid-template-columns: auto 1fr;
-      align-items: center;
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .topbar,
+    .notes-panel {
+      min-height: 78px;
       padding: 12px 14px;
       background: rgba(21, 31, 50, 0.92);
       border: 1px solid var(--border);
       border-radius: 18px;
       box-shadow: var(--shadow);
-      margin-bottom: 8px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 14px;
     }
 
     .brand {
@@ -151,7 +162,6 @@
     .privacy-timer strong {
       min-width: 48px;
       color: var(--accent);
-      font-family: var(--mono);
       font-size: 15px;
       text-align: center;
     }
@@ -173,38 +183,61 @@
       100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
     }
 
-    .status {
-      width: 330px;
-      flex: 0 0 330px;
-      padding: 8px 11px;
-      border-radius: 11px;
-      background: var(--panel-deep);
+    .btn-timer {
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .btn-clear-inline {
+      color: #fee2e2;
+      background: rgba(127, 29, 29, 0.22);
+      border-color: rgba(239, 68, 68, 0.24);
+    }
+
+    .btn-clear-inline:hover {
+      background: rgba(127, 29, 29, 0.34);
+    }
+
+    .notes-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .notes-panel textarea {
+      width: 100%;
+      min-height: 54px;
+      resize: vertical;
       border: 1px solid var(--border);
-      color: var(--muted);
-      text-align: center;
+      border-radius: 10px;
+      background: var(--panel-deep);
+      color: var(--text);
+      padding: 9px 10px;
       font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-family: var(--mono);
+      line-height: 1.35;
+      outline: none;
     }
 
-    .status.success {
-      color: #bbf7d0;
-      background: var(--green-soft);
-      border-color: rgba(34, 197, 94, 0.34);
+    .notes-panel textarea::placeholder {
+      color: rgba(148, 163, 184, 0.68);
     }
 
-    .status.warning {
-      color: #fde68a;
-      background: rgba(245, 158, 11, 0.13);
-      border-color: rgba(245, 158, 11, 0.30);
+    .notes-panel textarea:focus {
+      border-color: rgba(56, 189, 248, 0.36);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
     }
 
-    .status.error {
-      color: #fecaca;
-      background: var(--red-soft);
-      border-color: rgba(239, 68, 68, 0.30);
+    .notes-actions {
+      display: flex;
+      align-items: stretch;
     }
 
     .ticker-row {
@@ -215,7 +248,7 @@
       margin-bottom: 10px;
     }
 
-    .reminder-ticker {
+    .status-ticker {
       grid-column: span 3;
       min-height: 48px;
       border-radius: 11px;
@@ -226,36 +259,32 @@
       box-shadow: var(--shadow);
       display: flex;
       align-items: center;
-      position: relative;
       min-width: 0;
-    }
-
-    .ticker-text {
-      display: inline-block;
-      white-space: nowrap;
-      font-size: 14px;
       font-family: var(--mono);
-      padding-left: 14px;
-      padding-right: 14px;
+      font-size: 14px;
+      padding: 0 14px;
     }
 
-    .ticker-text strong {
+    .status-ticker.success {
+      color: #bbf7d0;
+      background: var(--green-soft);
+      border-color: rgba(34, 197, 94, 0.34);
+    }
+
+    .status-ticker.warning {
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.13);
+      border-color: rgba(245, 158, 11, 0.30);
+    }
+
+    .status-ticker.error {
+      color: #fecaca;
+      background: var(--red-soft);
+      border-color: rgba(239, 68, 68, 0.30);
+    }
+
+    .status-ticker strong {
       color: var(--accent);
-    }
-
-    .reminder-ticker.active {
-      border-color: rgba(221, 220, 0, 0.24);
-      color: var(--text);
-    }
-
-    .reminder-ticker.active .ticker-text {
-      padding-left: 100%;
-      animation: tickerMove 55s linear forwards;
-    }
-
-    @keyframes tickerMove {
-      from { transform: translateX(0); }
-      to { transform: translateX(-100%); }
     }
 
     .alpha-card {
@@ -316,7 +345,7 @@
       letter-spacing: -0.03em;
     }
 
-    .btn-undo {
+    .btn-column-clear {
       width: 34px;
       height: 32px;
       padding: 0;
@@ -325,12 +354,6 @@
       color: var(--text-soft);
       border: 1px solid var(--border);
       font-size: 16px;
-    }
-
-    .btn-undo:disabled {
-      opacity: 0.33;
-      cursor: not-allowed;
-      transform: none;
     }
 
     .number-input {
@@ -583,79 +606,6 @@
       background: rgba(239, 68, 68, 0.20);
     }
 
-    .btn-timer {
-      width: 29px;
-      height: 29px;
-      padding: 0;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.06);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-size: 15px;
-      line-height: 1;
-    }
-
-    .btn-clear-inline {
-      color: #fee2e2;
-      background: rgba(127, 29, 29, 0.22);
-      border-color: rgba(239, 68, 68, 0.24);
-    }
-
-    .btn-clear-inline:hover {
-      background: rgba(127, 29, 29, 0.34);
-    }
-
-    .notes-panel {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: stretch;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: var(--radius);
-      background: rgba(21, 31, 50, 0.74);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .notes-panel textarea {
-      width: 100%;
-      min-height: 42px;
-      max-height: 120px;
-      resize: vertical;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--panel-deep);
-      color: var(--text);
-      padding: 9px 10px;
-      font-size: 13px;
-      line-height: 1.35;
-      outline: none;
-    }
-
-    .notes-panel textarea::placeholder {
-      color: rgba(148, 163, 184, 0.68);
-    }
-
-    .notes-panel textarea:focus {
-      border-color: rgba(56, 189, 248, 0.36);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
-    }
-
-    .notes-actions {
-      display: flex;
-      align-items: stretch;
-      gap: 6px;
-      flex-wrap: wrap;
-      max-width: 260px;
-    }
-
-    .notes-actions button {
-      flex: 1 1 auto;
-      min-width: 86px;
-      padding: 7px 9px;
-    }
-
     .footer {
       margin-top: 10px;
       padding: 10px 12px;
@@ -672,38 +622,16 @@
       font-weight: 700;
     }
 
-    .footer-stats {
-      margin-top: 6px;
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .footer-stats span span {
-      color: var(--accent);
-    }
-
-    .timer-link {
-      cursor: pointer;
-      border-bottom: 1px dashed rgba(221, 220, 0, 0.45);
-      padding-bottom: 1px;
-    }
-
-    .timer-link:hover {
-      color: #fef9c3;
-      border-bottom-color: #fef9c3;
-    }
-
     @media (max-width: 1100px) {
+      .top-layout {
+        grid-template-columns: 1fr;
+      }
+
       .ticker-row {
         grid-template-columns: 1fr;
       }
 
-      .reminder-ticker,
+      .status-ticker,
       .alpha-card {
         grid-column: auto;
       }
@@ -744,11 +672,6 @@
         grid-template-columns: 1fr;
       }
 
-      .status {
-        width: 100%;
-        flex: 1 1 100%;
-      }
-
       .privacy-timer {
         width: 100%;
         justify-content: center;
@@ -757,10 +680,6 @@
       .notes-panel {
         grid-template-columns: 1fr;
       }
-
-      .notes-actions {
-        max-width: none;
-      }
     }
   </style>
 </head>
@@ -768,49 +687,60 @@
 <body>
   <div class="app">
 
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">DBD</div>
+    <div class="top-layout">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">DBD</div>
 
-        <div class="title">
-          <h1>DBD-Assistent</h1>
-          <p>Effizientes Kopieren von Befehlen</p>
+          <div class="title">
+            <h1>DBD-Assistent</h1>
+            <p>Effizientes Kopieren von Befehlen</p>
+          </div>
         </div>
-      </div>
 
-      <div class="right-tools">
-        <div id="privacyTimerBox" class="privacy-timer">
-          <span>Auto-Clear</span>
-          <strong id="privacyTimer">05:00</strong>
+        <div class="right-tools">
+          <div id="privacyTimerBox" class="privacy-timer">
+            <span>Auto-Clear</span>
+            <strong id="privacyTimer">10:00</strong>
 
-          <button
-            class="btn-timer"
-            onclick="resetPrivacyTimer()"
-            title="Timer wieder auf 5 Minuten setzen"
-          >
-            🔄
+            <button
+              class="btn-timer"
+              onclick="resetPrivacyTimer()"
+              title="Timer wieder auf 10 Minuten setzen"
+            >
+              🔄
+            </button>
+
+            <button
+              class="btn-timer btn-clear-inline"
+              onclick="manualClearNumbers()"
+              title="Alle Nummern löschen. Notizen bleiben erhalten."
+            >
+              ♻️
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="notes-panel">
+        <textarea
+          id="notes"
+          placeholder="Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht."
+        ></textarea>
+
+        <div class="notes-actions">
+          <button class="btn-danger" onclick="clearNotes()" title="Notizen löschen">
+            🧹 Clear
           </button>
-
-          <button
-            class="btn-timer btn-clear-inline"
-            onclick="manualClearNumbers()"
-            title="Alle Nummern löschen. Notizen bleiben erhalten."
-          >
-            ♻️
-          </button>
         </div>
-
-        <div id="status" class="status">
-          Status: Bereit.
-        </div>
-      </div>
-    </header>
+      </section>
+    </div>
 
     <div class="ticker-row">
-      <section id="reminderTicker" class="reminder-ticker">
-        <div id="tickerText" class="ticker-text">
-          <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
-        </div>
+      <section id="statusTicker" class="status-ticker">
+        <span id="statusText">
+          <strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
+        </span>
       </section>
 
       <section class="alpha-card">
@@ -845,52 +775,22 @@
 
     <main id="grid" class="grid"></main>
 
-    <section class="notes-panel">
-      <textarea
-        id="notes"
-        placeholder="Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht."
-      ></textarea>
-
-      <div class="notes-actions">
-        <button class="btn-secondary" onclick="copyNotes()">📋 Notes</button>
-        <button class="btn-danger" onclick="clearNotes()">🧹 Clear</button>
-      </div>
-    </section>
-
     <footer class="footer">
-      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.1
-
-      <div class="footer-stats">
-        <span>Online: <span id="onlineTime">00:00:00</span></span>
-        <span>
-          Nächste Erinnerung:
-          <span
-            id="nextReminderTime"
-            class="timer-link"
-            onclick="showReminder(false)"
-            title="Jetzt Erinnerung anzeigen"
-          >
-            02:00:00
-          </span>
-        </span>
-      </div>
+      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.2
     </footer>
 
   </div>
 
   <script>
     /*
-      Основные настройки:
-      - Auto-Clear: 5 минут
-      - Напоминание: каждые 2 часа
-      - Заметки не очищаются автоматически
-      - Клиентские данные не сохраняются в localStorage/cookies/sessionStorage
+      RU: Основные настройки программы.
+      DE: Grundeinstellungen der Anwendung.
     */
-    const PRIVACY_TIMER_START = 5 * 60;
-    const REMINDER_INTERVAL = 2 * 60 * 60 * 1000;
-    const TICKER_ANIMATION_TIME = 55000;
+    const PRIVACY_TIMER_START_SECONDS = 10 * 60;
+    const STATUS_RESET_DELAY = 3000;
 
-    const DEFAULT_TICKER_TEXT = "<strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren";
+    const DEFAULT_STATUS_HTML =
+      "<strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren";
 
     const columns = [
       {
@@ -1032,25 +932,15 @@
     ];
 
     const grid = document.getElementById("grid");
-    const statusBox = document.getElementById("status");
+    const statusTicker = document.getElementById("statusTicker");
+    const statusText = document.getElementById("statusText");
 
-    const pageOpenedAt = Date.now();
-
-    let nextReminderAt = Date.now() + REMINDER_INTERVAL;
-    let privacySecondsLeft = PRIVACY_TIMER_START;
+    let privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
     let privacyTimerInterval = null;
-    let reminderHideTimer = null;
-
-    /*
-      Undo хранит только одно предыдущее значение на столбец.
-      Это оперативная память текущей страницы, не постоянное хранилище.
-    */
-    const previousValues = {};
+    let statusResetTimer = null;
 
     function createInterface() {
       columns.forEach(column => {
-        previousValues[column.id] = null;
-
         const columnElement = document.createElement("section");
         columnElement.className = "column";
         columnElement.dataset.columnId = column.id;
@@ -1062,13 +952,12 @@
             </div>
 
             <button
-              id="${column.id}-undo"
-              class="btn-undo"
-              onclick="undoColumn('${column.id}')"
-              title="Letzte Änderung zurücknehmen"
-              disabled
+              id="${column.id}-clear"
+              class="btn-column-clear"
+              onclick="clearColumn('${column.id}')"
+              title="Spalte leeren"
             >
-              🔙
+              ♻️
             </button>
           </div>
 
@@ -1089,7 +978,7 @@
           <div class="command-area">
             ${column.commands.map((command, index) => {
               const toneClass = command.tone ? `tone-${command.tone}` : "";
-              const flashClass = command.flashClass || (command.tone ? `flash-${command.tone}` : "");
+              const flashClass = command.tone ? `flash-${command.tone}` : "";
 
               return `
                 <div
@@ -1141,10 +1030,6 @@
 
         const input = document.getElementById(`${column.id}-input`);
 
-        input.addEventListener("beforeinput", () => {
-          rememberPreviousValue(column.id, input.value);
-        });
-
         input.addEventListener("input", () => {
           input.value = cleanValue(input.value);
           updateColumn(column);
@@ -1167,53 +1052,10 @@
 
     function cleanValue(value) {
       /*
-        Оставляем только первые 10 символов.
-        Пробелы по краям и переносы строк убираются.
+        RU: Оставляем первые 10 символов и убираем пробелы по краям.
+        DE: Es bleiben die ersten 10 Zeichen, äußere Leerzeichen werden entfernt.
       */
       return String(value || "").trim().slice(0, 10);
-    }
-
-    function rememberPreviousValue(columnId, oldValue) {
-      const currentValue = document.getElementById(`${columnId}-input`).value;
-
-      if (oldValue === currentValue && previousValues[columnId] !== null) {
-        return;
-      }
-
-      previousValues[columnId] = oldValue;
-      updateUndoButton(columnId);
-    }
-
-    function updateUndoButton(columnId) {
-      const button = document.getElementById(`${columnId}-undo`);
-
-      if (!button) {
-        return;
-      }
-
-      button.disabled = previousValues[columnId] === null;
-    }
-
-    function undoColumn(columnId) {
-      const oldValue = previousValues[columnId];
-
-      if (oldValue === null) {
-        setStatus("Kein Undo verfügbar.", "warning");
-        return;
-      }
-
-      const input = document.getElementById(`${columnId}-input`);
-      const column = getColumn(columnId);
-      const currentValue = input.value;
-
-      input.value = oldValue;
-      previousValues[columnId] = currentValue || null;
-
-      updateColumn(column);
-      updateUndoButton(columnId);
-      silentlyResetPrivacyTimer();
-
-      setStatus("Letzte Änderung rückgängig gemacht.", "success");
     }
 
     function updateColumn(column) {
@@ -1226,13 +1068,22 @@
       column.commands.forEach((command, index) => {
         const output = document.getElementById(`${column.id}-command-${index}`);
 
-        if (!value) {
-          output.value = "";
-          return;
-        }
-
-        output.value = `${command.prefix}${value}`;
+        output.value = value ? `${command.prefix}${value}` : "";
       });
+    }
+
+    function clearColumn(columnId) {
+      const column = getColumn(columnId);
+      const input = document.getElementById(`${columnId}-input`);
+
+      if (!column || !input) {
+        return;
+      }
+
+      input.value = "";
+      updateColumn(column);
+      silentlyResetPrivacyTimer();
+      setStatus(`${column.title} geleert.`, "warning");
     }
 
     async function copyText(text) {
@@ -1298,8 +1149,8 @@
     async function copyStaticCommand(elementId, withHD) {
       const field = document.getElementById(elementId);
       const baseCommand = field.value;
-
       const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
+
       await copyText(finalCommand);
       silentlyResetPrivacyTimer();
     }
@@ -1320,7 +1171,8 @@
       row.classList.remove(flashClass);
 
       /*
-        Небольшой reflow, чтобы повторное мигание запускалось каждый раз.
+        RU: Reflow нужен, чтобы повторная анимация запускалась каждый раз.
+        DE: Reflow sorgt dafür, dass die Animation jedes Mal neu startet.
       */
       void row.offsetWidth;
 
@@ -1331,34 +1183,26 @@
       }, 800);
     }
 
-    function copyNotes() {
-      const notes = document.getElementById("notes").value.trim();
-
-      if (!notes) {
-        setStatus("Keine Notizen vorhanden.", "warning");
-        return;
-      }
-
-      copyText(notes);
-    }
-
     function clearNotes() {
       document.getElementById("notes").value = "";
       setStatus("Notizen gelöscht.", "warning");
     }
 
     function setStatus(message, type) {
-      statusBox.textContent = `Status: ${message}`;
-      statusBox.className = "status";
+      clearTimeout(statusResetTimer);
+
+      statusTicker.className = "status-ticker";
 
       if (type) {
-        statusBox.classList.add(type);
+        statusTicker.classList.add(type);
       }
 
-      setTimeout(() => {
-        statusBox.textContent = "Status: Bereit.";
-        statusBox.className = "status";
-      }, 3000);
+      statusText.textContent = `Status: ${message}`;
+
+      statusResetTimer = setTimeout(() => {
+        statusTicker.className = "status-ticker";
+        statusText.innerHTML = DEFAULT_STATUS_HTML;
+      }, STATUS_RESET_DELAY);
     }
 
     function formatMinutesSeconds(seconds) {
@@ -1369,75 +1213,73 @@
       return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
     }
 
-    function formatHoursMinutesSeconds(milliseconds) {
-      const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    function getPrivacySecondsLeft() {
+      /*
+        RU: Таймер считается по реальному времени, а не по количеству тиков.
+        DE: Der Timer basiert auf echter Zeit, nicht auf der Anzahl der Intervalle.
+      */
+      return Math.max(0, Math.ceil((privacyDeadlineAt - Date.now()) / 1000));
     }
 
     function updatePrivacyTimerView() {
       const timer = document.getElementById("privacyTimer");
       const timerBox = document.getElementById("privacyTimerBox");
+      const secondsLeft = getPrivacySecondsLeft();
 
-      timer.textContent = formatMinutesSeconds(privacySecondsLeft);
+      timer.textContent = formatMinutesSeconds(secondsLeft);
 
-      if (privacySecondsLeft <= 60) {
+      if (secondsLeft <= 60) {
         timerBox.classList.add("danger");
       } else {
         timerBox.classList.remove("danger");
       }
     }
 
+    function handlePrivacyTimerTick() {
+      const secondsLeft = getPrivacySecondsLeft();
+
+      if (secondsLeft <= 0) {
+        clearSensitiveData();
+        setStatus("Nummern automatisch gelöscht.", "warning");
+        return;
+      }
+
+      updatePrivacyTimerView();
+    }
+
     function startPrivacyTimer() {
       clearInterval(privacyTimerInterval);
-      updatePrivacyTimerView();
+      handlePrivacyTimerTick();
 
-      privacyTimerInterval = setInterval(() => {
-        privacySecondsLeft--;
-        updatePrivacyTimerView();
-
-        if (privacySecondsLeft <= 0) {
-          clearInterval(privacyTimerInterval);
-          clearSensitiveData();
-          setStatus("Nummern automatisch gelöscht.", "warning");
-        }
-      }, 1000);
+      privacyTimerInterval = setInterval(handlePrivacyTimerTick, 1000);
     }
 
     function resetPrivacyTimer() {
-      privacySecondsLeft = PRIVACY_TIMER_START;
-      startPrivacyTimer();
+      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
+      updatePrivacyTimerView();
       setStatus("Timer zurückgesetzt.", "success");
     }
 
     function silentlyResetPrivacyTimer() {
-      privacySecondsLeft = PRIVACY_TIMER_START;
-      startPrivacyTimer();
+      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
+      updatePrivacyTimerView();
     }
 
     function clearSensitiveData() {
       /*
-        Заметки не очищаются.
-        Очищаются только номера, команды и временный Undo-буфер.
+        RU: Заметки не очищаются. Очищаются только номера и команды.
+        DE: Notizen bleiben erhalten. Nur Nummern und Befehle werden geleert.
       */
       document.querySelectorAll(".number-input").forEach(input => {
         input.value = "";
-      });
-
-      Object.keys(previousValues).forEach(columnId => {
-        previousValues[columnId] = null;
-        updateUndoButton(columnId);
       });
 
       columns.forEach(column => {
         updateColumn(column);
       });
 
-      privacySecondsLeft = PRIVACY_TIMER_START;
-      startPrivacyTimer();
+      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
+      updatePrivacyTimerView();
     }
 
     function manualClearNumbers() {
@@ -1445,79 +1287,25 @@
       setStatus("Nummern gelöscht. Notizen bleiben erhalten.", "warning");
     }
 
-    const reminderMessages = [
-      {
-        title: "Wasserpause",
-        text: "Ein paar Schlucke Wasser. Danach weiter."
-      },
-      {
-        title: "Kurze Bewegung",
-        text: "Schultern lockern, Nacken bewegen, einmal tief durchatmen."
-      },
-      {
-        title: "Augenpause",
-        text: "20 Sekunden in die Ferne schauen."
-      },
-      {
-        title: "Mini-Pause",
-        text: "Kurz aufrichten. Dann weiter kopieren."
-      }
-    ];
-
-    function showReminder(isAutomatic = true) {
-      const ticker = document.getElementById("reminderTicker");
-      const tickerText = document.getElementById("tickerText");
-
-      const randomMessage = reminderMessages[
-        Math.floor(Math.random() * reminderMessages.length)
-      ];
-
-      clearTimeout(reminderHideTimer);
-
-      ticker.classList.add("active");
-      tickerText.innerHTML = `<strong>${randomMessage.title}:</strong> ${randomMessage.text}`;
-      tickerText.style.animation = "none";
-
-      /*
-        Небольшой reflow, чтобы анимация бегущей строки запускалась заново.
-      */
-      void tickerText.offsetWidth;
-
-      tickerText.style.animation = `tickerMove ${TICKER_ANIMATION_TIME / 1000}s linear forwards`;
-
-      reminderHideTimer = setTimeout(() => {
-        ticker.classList.remove("active");
-        tickerText.style.animation = "none";
-        tickerText.innerHTML = DEFAULT_TICKER_TEXT;
-      }, TICKER_ANIMATION_TIME + 500);
-
-      if (isAutomatic) {
-        nextReminderAt = Date.now() + REMINDER_INTERVAL;
-      }
-    }
-
-    function updateFooterTimers() {
-      const onlineTime = document.getElementById("onlineTime");
-      const nextReminderTime = document.getElementById("nextReminderTime");
-
-      onlineTime.textContent = formatHoursMinutesSeconds(Date.now() - pageOpenedAt);
-      nextReminderTime.textContent = formatHoursMinutesSeconds(nextReminderAt - Date.now());
-
-      if (Date.now() >= nextReminderAt) {
-        showReminder(true);
-      }
-    }
-
     function setCurrentYear() {
       document.getElementById("currentYear").textContent = new Date().getFullYear();
     }
 
+    /*
+      RU: При возвращении во вкладку таймер сразу проверяет реальное прошедшее время.
+      DE: Beim Zurückkehren in den Tab prüft der Timer sofort die tatsächlich vergangene Zeit.
+    */
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        handlePrivacyTimerTick();
+      }
+    });
+
+    window.addEventListener("focus", handlePrivacyTimerTick);
+
     createInterface();
     startPrivacyTimer();
     setCurrentYear();
-    updateFooterTimers();
-
-    setInterval(updateFooterTimers, 1000);
   </script>
 </body>
 </html>
