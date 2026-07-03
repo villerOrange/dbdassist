@@ -1,65 +1,51 @@
+Готово. Добавил команду Eheverbund/Einzel PID anzeigen — 70anz030 под Rollen (Person) anzeigen, сделал блоки команд компактнее и обновил версию на 0.2.1.
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <title>DBD-Assistent</title>
-
   <style>
     :root {
       --bg: #0b1120;
       --panel: #151f32;
       --panel-soft: #1b2740;
       --panel-deep: #07101f;
-
       --text: #e5e7eb;
       --text-soft: #cbd5e1;
       --muted: #94a3b8;
-
       --accent: #dddc00;
       --accent-soft: rgba(221, 220, 0, 0.14);
-
       --blue: #38bdf8;
       --blue-soft: rgba(56, 189, 248, 0.14);
-
       --green: #22c55e;
       --green-soft: rgba(34, 197, 94, 0.13);
-
       --orange: #fb923c;
       --orange-soft: rgba(251, 146, 60, 0.16);
-
       --purple: #c084fc;
       --purple-soft: rgba(192, 132, 252, 0.15);
-
       --yellow: #fde047;
       --yellow-soft: rgba(253, 224, 71, 0.15);
-
       --red: #ef4444;
       --red-soft: rgba(239, 68, 68, 0.13);
-
       --warning: #7f1d1d;
       --warning-soft: rgba(127, 29, 29, 0.42);
-
       --border: rgba(148, 163, 184, 0.16);
       --border-strong: rgba(148, 163, 184, 0.28);
-
       --shadow: 0 18px 45px rgba(0, 0, 0, 0.34);
       --radius: 16px;
-
       --ui: "Segoe UI", Arial, Helvetica, sans-serif;
       --mono: "Cascadia Code", Consolas, "Lucida Console", "Courier New", monospace;
       --logo-font: "Lucida Console", "Cascadia Code", Consolas, "Courier New", monospace;
     }
-
     * {
       box-sizing: border-box;
     }
-
     html,
     body {
       max-width: 100%;
       overflow-x: hidden;
     }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -71,20 +57,17 @@
       color: var(--text);
       padding: 14px;
     }
-
     .app {
       max-width: 1500px;
       margin: 0 auto;
       min-width: 0;
     }
-
     .top-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       margin-bottom: 10px;
     }
-
     .topbar,
     .notes-panel {
       min-height: 78px;
@@ -95,21 +78,18 @@
       box-shadow: var(--shadow);
       min-width: 0;
     }
-
     .topbar {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
       gap: 14px;
     }
-
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
       min-width: 0;
     }
-
     .logo {
       width: 50px;
       height: 50px;
@@ -132,11 +112,9 @@
         inset 0 0 16px rgba(221, 220, 0, 0.08),
         0 0 20px rgba(221, 220, 0, 0.06);
     }
-
     .title {
       min-width: 0;
     }
-
     .title h1 {
       margin: 0;
       font-size: 25px;
@@ -146,7 +124,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .title p {
       margin: 3px 0 0;
       color: var(--muted);
@@ -155,7 +132,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .right-tools {
       display: flex;
       align-items: center;
@@ -164,7 +140,6 @@
       flex-wrap: wrap;
       min-width: 0;
     }
-
     .privacy-timer {
       display: flex;
       align-items: center;
@@ -179,31 +154,26 @@
       font-family: var(--mono);
       min-width: 0;
     }
-
     .privacy-timer strong {
       min-width: 48px;
       color: var(--accent);
       font-size: 15px;
       text-align: center;
     }
-
     .privacy-timer.danger {
       background: var(--warning-soft);
       border-color: rgba(239, 68, 68, 0.5);
       color: #fecaca;
       animation: timerBlink 1s infinite;
     }
-
     .privacy-timer.danger strong {
       color: #fecaca;
     }
-
     @keyframes timerBlink {
       0% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
       50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.42); }
       100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
     }
-
     .btn-timer {
       width: 29px;
       height: 29px;
@@ -215,24 +185,20 @@
       font-size: 15px;
       line-height: 1;
     }
-
     .btn-clear-inline {
       color: #fee2e2;
       background: rgba(127, 29, 29, 0.22);
       border-color: rgba(239, 68, 68, 0.24);
     }
-
     .btn-clear-inline:hover {
       background: rgba(127, 29, 29, 0.34);
     }
-
     .notes-panel {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: stretch;
     }
-
     .notes-panel textarea {
       width: 100%;
       min-width: 0;
@@ -247,21 +213,17 @@
       line-height: 1.35;
       outline: none;
     }
-
     .notes-panel textarea::placeholder {
       color: rgba(148, 163, 184, 0.68);
     }
-
     .notes-panel textarea:focus {
       border-color: rgba(56, 189, 248, 0.36);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
     }
-
     .notes-actions {
       display: flex;
       align-items: stretch;
     }
-
     .ticker-row {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -270,7 +232,6 @@
       margin-bottom: 10px;
       min-width: 0;
     }
-
     .status-ticker {
       grid-column: span 3;
       min-height: 72px;
@@ -287,29 +248,24 @@
       font-size: 14px;
       padding: 0 14px;
     }
-
     .status-ticker.success {
       color: #bbf7d0;
       background: var(--green-soft);
       border-color: rgba(34, 197, 94, 0.34);
     }
-
     .status-ticker.warning {
       color: #fde68a;
       background: rgba(245, 158, 11, 0.13);
       border-color: rgba(245, 158, 11, 0.30);
     }
-
     .status-ticker.error {
       color: #fecaca;
       background: var(--red-soft);
       border-color: rgba(239, 68, 68, 0.30);
     }
-
     .status-ticker strong {
       color: var(--accent);
     }
-
     .alpha-card {
       grid-column: span 1;
       min-height: 72px;
@@ -330,7 +286,6 @@
       box-shadow: var(--shadow);
       overflow: hidden;
     }
-
     .alpha-label {
       grid-area: label;
       color: var(--text-soft);
@@ -341,19 +296,15 @@
       text-overflow: ellipsis;
       min-width: 0;
     }
-
     .alpha-output {
       grid-area: output;
     }
-
     .alpha-copy {
       grid-area: copy;
     }
-
     .alpha-hd {
       grid-area: hd;
     }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(210px, 1fr));
@@ -361,7 +312,6 @@
       align-items: start;
       min-width: 0;
     }
-
     .column {
       background: rgba(21, 31, 50, 0.94);
       border: 1px solid var(--border);
@@ -371,20 +321,17 @@
       min-height: 100%;
       min-width: 0;
     }
-
     .column:hover {
       border-color: var(--border-strong);
       background: rgba(27, 39, 64, 0.95);
     }
-
     .column-header {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
-
     .column-title h2 {
       margin: 0;
       font-size: 17px;
@@ -394,117 +341,98 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .btn-column-clear {
-      width: 34px;
-      height: 32px;
+      width: 32px;
+      height: 30px;
       padding: 0;
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--panel-deep);
       color: var(--text-soft);
       border: 1px solid var(--border);
-      font-size: 16px;
+      font-size: 15px;
     }
-
     .number-input {
       width: 100%;
       min-width: 0;
-      padding: 9px 10px;
+      padding: 8px 9px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--panel-deep);
       color: #ffffff;
-      font-size: 20px;
+      font-size: 19px;
       font-family: var(--mono);
       letter-spacing: 0.04em;
       outline: none;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
-
     .number-input:focus {
       border-color: rgba(221, 220, 0, 0.48);
       box-shadow: 0 0 0 3px rgba(221, 220, 0, 0.08);
     }
-
     .number-input::placeholder {
       color: rgba(148, 163, 184, 0.58);
     }
-
     .input-info {
       display: flex;
       justify-content: space-between;
       gap: 8px;
       color: var(--muted);
       font-size: 11px;
-      margin-bottom: 8px;
-      line-height: 1.2;
+      margin-bottom: 6px;
+      line-height: 1.15;
     }
-
     .command-area {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 5px;
     }
-
     .command-row {
-      padding: 8px;
-      border-radius: 12px;
+      padding: 6px;
+      border-radius: 10px;
       background: rgba(7, 16, 31, 0.45);
       border: 1px solid rgba(148, 163, 184, 0.10);
       min-width: 0;
     }
-
     .command-row.tone-green {
       background: rgba(20, 83, 45, 0.26);
       border-color: rgba(34, 197, 94, 0.22);
     }
-
     .command-row.tone-orange {
       background: rgba(154, 52, 18, 0.30);
       border-color: rgba(251, 146, 60, 0.34);
     }
-
     .command-row.tone-purple {
       background: rgba(88, 28, 135, 0.30);
       border-color: rgba(192, 132, 252, 0.34);
     }
-
     .command-row.tone-blue {
       background: rgba(12, 74, 110, 0.32);
       border-color: rgba(56, 189, 248, 0.34);
     }
-
     .command-row.tone-yellow {
       background: rgba(113, 63, 18, 0.32);
       border-color: rgba(253, 224, 71, 0.34);
     }
-
     .command-row.tone-green .command-label { color: #bbf7d0; }
     .command-row.tone-orange .command-label { color: #fed7aa; }
     .command-row.tone-purple .command-label { color: #e9d5ff; }
     .command-row.tone-blue .command-label { color: #bae6fd; }
     .command-row.tone-yellow .command-label { color: #fef08a; }
-
     .command-row.flash-green {
       animation: commandFlashGreen 650ms ease-out 1;
     }
-
     .command-row.flash-orange {
       animation: commandFlashOrange 750ms ease-out 1;
     }
-
     .command-row.flash-purple {
       animation: commandFlashPurple 750ms ease-out 1;
     }
-
     .command-row.flash-blue {
       animation: commandFlashBlue 750ms ease-out 1;
     }
-
     .command-row.flash-yellow {
       animation: commandFlashYellow 750ms ease-out 1;
     }
-
     @keyframes commandFlashGreen {
       0% { background: rgba(20, 83, 45, 0.26); }
       25% {
@@ -513,7 +441,6 @@
       }
       100% { background: rgba(20, 83, 45, 0.26); }
     }
-
     @keyframes commandFlashOrange {
       0% { background: rgba(154, 52, 18, 0.30); }
       25% {
@@ -522,7 +449,6 @@
       }
       100% { background: rgba(154, 52, 18, 0.30); }
     }
-
     @keyframes commandFlashPurple {
       0% { background: rgba(88, 28, 135, 0.30); }
       25% {
@@ -531,7 +457,6 @@
       }
       100% { background: rgba(88, 28, 135, 0.30); }
     }
-
     @keyframes commandFlashBlue {
       0% { background: rgba(12, 74, 110, 0.32); }
       25% {
@@ -540,7 +465,6 @@
       }
       100% { background: rgba(12, 74, 110, 0.32); }
     }
-
     @keyframes commandFlashYellow {
       0% { background: rgba(113, 63, 18, 0.32); }
       25% {
@@ -549,57 +473,51 @@
       }
       100% { background: rgba(113, 63, 18, 0.32); }
     }
-
     .command-label {
-      margin-bottom: 5px;
-      font-size: 12px;
+      margin-bottom: 3px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--text-soft);
       cursor: copy;
       user-select: none;
+      line-height: 1.15;
     }
-
     .command-label:hover {
       color: var(--accent);
     }
-
     .command-controls {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 6px;
+      gap: 5px;
       min-width: 0;
     }
-
     .command-output,
     .alpha-output {
       width: 100%;
       min-width: 0;
-      padding: 8px 9px;
-      border-radius: 9px;
+      padding: 6px 8px;
+      border-radius: 8px;
       border: 1px solid rgba(148, 163, 184, 0.13);
       background: #020617;
       color: var(--accent);
       font-family: var(--mono);
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
       cursor: copy;
     }
-
     .command-output:focus,
     .alpha-output:focus {
       border-color: rgba(56, 189, 248, 0.38);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
     }
-
     .command-output::placeholder {
       color: rgba(148, 163, 184, 0.32);
     }
-
     button {
       border: none;
-      border-radius: 9px;
-      padding: 8px 10px;
-      font-size: 13px;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
       font-weight: 800;
       cursor: pointer;
       transition:
@@ -610,45 +528,36 @@
       white-space: nowrap;
       font-family: var(--ui);
     }
-
     button:hover {
       transform: translateY(-1px);
     }
-
     button:active {
       transform: translateY(0);
     }
-
     .btn-copy {
       background: var(--blue-soft);
       color: #e0f2fe;
       border: 1px solid rgba(56, 189, 248, 0.30);
     }
-
     .btn-copy:hover {
       background: rgba(56, 189, 248, 0.22);
     }
-
     .btn-hd {
       background: var(--accent-soft);
       color: #fef9c3;
       border: 1px solid rgba(221, 220, 0, 0.28);
     }
-
     .btn-hd:hover {
       background: rgba(221, 220, 0, 0.20);
     }
-
     .btn-danger {
       background: var(--red-soft);
       color: #fecaca;
       border: 1px solid rgba(239, 68, 68, 0.24);
     }
-
     .btn-danger:hover {
       background: rgba(239, 68, 68, 0.20);
     }
-
     .footer {
       margin-top: 10px;
       padding: 10px 12px;
@@ -659,104 +568,83 @@
       background: rgba(7, 16, 31, 0.45);
       border: 1px solid rgba(148, 163, 184, 0.10);
     }
-
     .footer strong {
       color: var(--text-soft);
       font-weight: 700;
     }
-
     @media (max-width: 1100px) {
       .top-layout {
         grid-template-columns: 1fr;
       }
-
       .ticker-row {
         grid-template-columns: 1fr;
       }
-
       .status-ticker,
       .alpha-card {
         grid-column: auto;
       }
     }
-
     @media (max-width: 980px) {
       .grid {
         grid-template-columns: repeat(2, minmax(210px, 1fr));
       }
-
       .topbar {
         grid-template-columns: 1fr;
       }
-
       .right-tools {
         justify-content: flex-start;
       }
     }
-
     @media (max-width: 580px) {
       body {
         padding: 9px;
       }
-
       .grid {
         grid-template-columns: 1fr;
       }
-
       .brand {
         min-width: 0;
       }
-
       .title h1 {
         font-size: 22px;
       }
-
       .command-controls {
         grid-template-columns: minmax(0, 1fr) auto auto;
       }
-
       .alpha-card {
         grid-template-columns: minmax(0, 1fr) auto auto;
         grid-template-areas:
           "label label label"
           "output copy hd";
       }
-
       .privacy-timer {
         width: 100%;
         justify-content: center;
       }
-
       .notes-panel {
         grid-template-columns: 1fr;
       }
-
       .notes-actions {
         justify-content: stretch;
       }
     }
   </style>
 </head>
-
 <body>
   <div class="app">
-
     <div class="top-layout">
       <header class="topbar">
         <div class="brand">
           <div class="logo">DBD</div>
-
           <div class="title">
             <h1>DBD-Assistent</h1>
             <p>Effizientes Kopieren von Befehlen</p>
           </div>
         </div>
-
         <div class="right-tools">
           <div id="privacyTimerBox" class="privacy-timer">
             <span>Auto-Clear</span>
             <strong id="privacyTimer">10:00</strong>
-
             <button
               class="btn-timer"
               onclick="resetPrivacyTimer()"
@@ -764,7 +652,6 @@
             >
               🔄
             </button>
-
             <button
               class="btn-timer btn-clear-inline"
               onclick="manualClearNumbers()"
@@ -775,13 +662,15 @@
           </div>
         </div>
       </header>
-
       <section class="notes-panel">
         <textarea
           id="notes"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           placeholder="Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht."
         ></textarea>
-
         <div class="notes-actions">
           <button class="btn-danger" onclick="clearNotes()" title="Notizen löschen">
             🧹 Clear
@@ -789,26 +678,26 @@
         </div>
       </section>
     </div>
-
     <div class="ticker-row">
       <section id="statusTicker" class="status-ticker">
         <span id="statusText">
           <strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
         </span>
       </section>
-
       <section class="alpha-card">
         <div class="alpha-label">Alpha-Abfrage</div>
-
         <input
           id="alpha-command"
           class="alpha-output"
           value="70anz090"
           readonly
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           ondblclick="copyStaticCommand('alpha-command', false)"
           title="Doppelklick: Befehl kopieren"
         />
-
         <button
           class="btn-copy alpha-copy"
           onclick="copyStaticCommand('alpha-command', false)"
@@ -816,7 +705,6 @@
         >
           Copy
         </button>
-
         <button
           class="btn-hd alpha-hd"
           onclick="copyStaticCommand('alpha-command', true)"
@@ -826,15 +714,11 @@
         </button>
       </section>
     </div>
-
     <main id="grid" class="grid"></main>
-
     <footer class="footer">
-      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.2
+      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.2.1
     </footer>
-
   </div>
-
   <script>
     /*
       RU: Основные настройки программы.
@@ -842,10 +726,8 @@
     */
     const PRIVACY_TIMER_START_SECONDS = 10 * 60;
     const STATUS_RESET_DELAY = 3000;
-
     const DEFAULT_STATUS_HTML =
       "<strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren";
-
     const columns = [
       {
         id: "depot",
@@ -857,7 +739,6 @@
             prefix: "90anz091",
             tone: "green"
           },
-
           {
             label: "Sperren anzeigen",
             prefix: "11anz213"
@@ -875,13 +756,15 @@
             label: "Sperre ändern",
             prefix: "11aen213"
           },
-
           {
             label: "Rollen (Person) anzeigen",
             prefix: "10anz113",
             tone: "purple"
           },
-
+          {
+            label: "Eheverbund/Einzel PID anzeigen",
+            prefix: "70anz030"
+          },
           {
             label: "Hinweistexte anzeigen",
             prefix: "10anz013"
@@ -895,7 +778,6 @@
             label: "Hinweistexte setzen",
             prefix: "10neu013"
           },
-
           {
             label: "FSA Zukunft anzeigen",
             prefix: "70anz040"
@@ -904,7 +786,6 @@
             label: "FSA Vorjahr anzeigen",
             prefix: "70anz042"
           },
-
           {
             label: "Bankverbindung",
             prefix: "10anz012"
@@ -984,27 +865,22 @@
         ]
       }
     ];
-
     const grid = document.getElementById("grid");
     const statusTicker = document.getElementById("statusTicker");
     const statusText = document.getElementById("statusText");
-
     let privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
     let privacyTimerInterval = null;
     let statusResetTimer = null;
-
     function createInterface() {
       columns.forEach(column => {
         const columnElement = document.createElement("section");
         columnElement.className = "column";
         columnElement.dataset.columnId = column.id;
-
         columnElement.innerHTML = `
           <div class="column-header">
             <div class="column-title">
               <h2>${column.title}</h2>
             </div>
-
             <button
               id="${column.id}-clear"
               class="btn-column-clear"
@@ -1014,26 +890,24 @@
               ♻️
             </button>
           </div>
-
           <input
             id="${column.id}-input"
             class="number-input"
             maxlength="10"
             placeholder="${column.placeholder}"
             autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
             spellcheck="false"
           />
-
           <div class="input-info">
             <span>Max. 10 Zeichen</span>
             <span id="${column.id}-counter">0 / 10</span>
           </div>
-
           <div class="command-area">
             ${column.commands.map((command, index) => {
               const toneClass = command.tone ? `tone-${command.tone}` : "";
               const flashClass = command.tone ? `flash-${command.tone}` : "";
-
               return `
                 <div
                   class="command-row ${toneClass}"
@@ -1046,7 +920,6 @@
                   >
                     ${command.label}
                   </div>
-
                   <div class="command-controls">
                     <input
                       id="${column.id}-command-${index}"
@@ -1054,10 +927,13 @@
                       value=""
                       placeholder="${command.prefix}..."
                       readonly
+                      autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      spellcheck="false"
                       ondblclick="copyCommand('${column.id}-command-${index}', false)"
                       title="Doppelklick: Befehl kopieren"
                     />
-
                     <button
                       class="btn-copy"
                       onclick="copyCommand('${column.id}-command-${index}', false)"
@@ -1065,7 +941,6 @@
                     >
                       Copy
                     </button>
-
                     <button
                       class="btn-hd"
                       onclick="copyCommand('${column.id}-command-${index}', true)"
@@ -1079,31 +954,24 @@
             }).join("")}
           </div>
         `;
-
         grid.appendChild(columnElement);
-
         const input = document.getElementById(`${column.id}-input`);
-
         input.addEventListener("input", () => {
           input.value = cleanValue(input.value);
           updateColumn(column);
           silentlyResetPrivacyTimer();
         });
-
         input.addEventListener("focus", () => {
           input.select();
         });
-
         input.addEventListener("click", () => {
           input.select();
         });
       });
     }
-
     function getColumn(columnId) {
       return columns.find(column => column.id === columnId);
     }
-
     function cleanValue(value) {
       /*
         RU: Оставляем первые 10 символов и убираем пробелы по краям.
@@ -1111,48 +979,38 @@
       */
       return String(value || "").trim().slice(0, 10);
     }
-
     function updateColumn(column) {
       const input = document.getElementById(`${column.id}-input`);
       const counter = document.getElementById(`${column.id}-counter`);
       const value = input.value.trim();
-
       counter.textContent = `${value.length} / 10`;
-
       column.commands.forEach((command, index) => {
         const output = document.getElementById(`${column.id}-command-${index}`);
-
         output.value = value ? `${command.prefix}${value}` : "";
       });
     }
-
     function clearColumn(columnId) {
       const column = getColumn(columnId);
       const input = document.getElementById(`${columnId}-input`);
-
       if (!column || !input) {
         return;
       }
-
       input.value = "";
       updateColumn(column);
       silentlyResetPrivacyTimer();
       setStatus(`${column.title} geleert.`, "warning");
     }
-
     async function copyText(text) {
       if (!text) {
         setStatus("Nichts zu kopieren.", "warning");
         return false;
       }
-
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(text);
         } else {
           fallbackCopy(text);
         }
-
         setStatus(`Kopiert: ${text}`, "success");
         return true;
       } catch (error) {
@@ -1166,107 +1024,81 @@
         }
       }
     }
-
     function fallbackCopy(text) {
       const textarea = document.createElement("textarea");
       textarea.value = text;
       textarea.style.position = "fixed";
       textarea.style.left = "-9999px";
       textarea.style.top = "-9999px";
-
       document.body.appendChild(textarea);
       textarea.focus();
       textarea.select();
-
       document.execCommand("copy");
       document.body.removeChild(textarea);
     }
-
     async function copyCommand(elementId, withHD) {
       const field = document.getElementById(elementId);
       const baseCommand = field.value;
-
       if (!baseCommand) {
         setStatus("Erst Nummer einfügen.", "warning");
         return;
       }
-
       const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
       const copied = await copyText(finalCommand);
-
       if (copied) {
         flashCommandRow(field);
         silentlyResetPrivacyTimer();
       }
     }
-
     async function copyStaticCommand(elementId, withHD) {
       const field = document.getElementById(elementId);
       const baseCommand = field.value;
       const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
-
       await copyText(finalCommand);
       silentlyResetPrivacyTimer();
     }
-
     function flashCommandRow(field) {
       const row = field.closest(".command-row");
-
       if (!row) {
         return;
       }
-
       const flashClass = row.dataset.flashClass;
-
       if (!flashClass) {
         return;
       }
-
       row.classList.remove(flashClass);
-
       /*
         RU: Reflow нужен, чтобы повторная анимация запускалась каждый раз.
         DE: Reflow sorgt dafür, dass die Animation jedes Mal neu startet.
       */
       void row.offsetWidth;
-
       row.classList.add(flashClass);
-
       setTimeout(() => {
         row.classList.remove(flashClass);
       }, 800);
     }
-
     function clearNotes() {
       document.getElementById("notes").value = "";
       setStatus("Notizen gelöscht.", "warning");
     }
-
     function setStatus(message, type) {
       clearTimeout(statusResetTimer);
-
       statusTicker.className = "status-ticker";
-
       if (type) {
         statusTicker.classList.add(type);
       }
-
       statusText.textContent = `Status: ${message}`;
-
       statusResetTimer = setTimeout(() => {
         statusTicker.className = "status-ticker";
         statusText.innerHTML = DEFAULT_STATUS_HTML;
       }, STATUS_RESET_DELAY);
     }
-
     function formatMinutesSeconds(seconds) {
       const safeSeconds = Math.max(0, seconds);
       const minutes = Math.floor(safeSeconds / 60);
       const restSeconds = safeSeconds % 60;
-
       return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
     }
-
     function getPrivacySecondsLeft() {
       /*
         RU: Таймер считается по реальному времени, а не по количеству тиков.
@@ -1274,51 +1106,40 @@
       */
       return Math.max(0, Math.ceil((privacyDeadlineAt - Date.now()) / 1000));
     }
-
     function updatePrivacyTimerView() {
       const timer = document.getElementById("privacyTimer");
       const timerBox = document.getElementById("privacyTimerBox");
       const secondsLeft = getPrivacySecondsLeft();
-
       timer.textContent = formatMinutesSeconds(secondsLeft);
-
       if (secondsLeft <= 60) {
         timerBox.classList.add("danger");
       } else {
         timerBox.classList.remove("danger");
       }
     }
-
     function handlePrivacyTimerTick() {
       const secondsLeft = getPrivacySecondsLeft();
-
       if (secondsLeft <= 0) {
         clearSensitiveData();
         setStatus("Nummern automatisch gelöscht.", "warning");
         return;
       }
-
       updatePrivacyTimerView();
     }
-
     function startPrivacyTimer() {
       clearInterval(privacyTimerInterval);
       handlePrivacyTimerTick();
-
       privacyTimerInterval = setInterval(handlePrivacyTimerTick, 1000);
     }
-
     function resetPrivacyTimer() {
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
       setStatus("Timer zurückgesetzt.", "success");
     }
-
     function silentlyResetPrivacyTimer() {
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
     }
-
     function clearSensitiveData() {
       /*
         RU: Заметки не очищаются. Очищаются только номера и команды.
@@ -1327,24 +1148,19 @@
       document.querySelectorAll(".number-input").forEach(input => {
         input.value = "";
       });
-
       columns.forEach(column => {
         updateColumn(column);
       });
-
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
     }
-
     function manualClearNumbers() {
       clearSensitiveData();
       setStatus("Nummern gelöscht. Notizen bleiben erhalten.", "warning");
     }
-
     function setCurrentYear() {
       document.getElementById("currentYear").textContent = new Date().getFullYear();
     }
-
     /*
       RU: При возвращении во вкладку таймер сразу проверяет реальное прошедшее время.
       DE: Beim Zurückkehren in den Tab prüft der Timer sofort die tatsächlich vergangene Zeit.
@@ -1354,9 +1170,7 @@
         handlePrivacyTimerTick();
       }
     });
-
     window.addEventListener("focus", handlePrivacyTimerTick);
-
     createInterface();
     startPrivacyTimer();
     setCurrentYear();
