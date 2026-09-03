@@ -1,49 +1,64 @@
 <!DOCTYPE html>
-<html lang="de">
-<head> 
-  <meta charset="UTF-8" />
+<html lang='de'>
+<head>
+  <meta charset='UTF-8' />
   <title>DBD-Assistent</title>
+
   <style>
     :root {
       --bg: #0b1120;
       --panel: #151f32;
-      --panel-soft: #1b2740;
       --panel-deep: #07101f;
       --text: #e5e7eb;
       --text-soft: #cbd5e1;
       --muted: #94a3b8;
+      --title: #f8fafc;
+      --input-bg: #020617;
       --accent: #dddc00;
       --accent-soft: rgba(221, 220, 0, 0.14);
-      --blue: #38bdf8;
       --blue-soft: rgba(56, 189, 248, 0.14);
-      --green: #22c55e;
       --green-soft: rgba(34, 197, 94, 0.13);
-      --orange: #fb923c;
-      --orange-soft: rgba(251, 146, 60, 0.16);
-      --purple: #c084fc;
-      --purple-soft: rgba(192, 132, 252, 0.15);
-      --yellow: #fde047;
-      --yellow-soft: rgba(253, 224, 71, 0.15);
-      --red: #ef4444;
       --red-soft: rgba(239, 68, 68, 0.13);
-      --warning: #7f1d1d;
       --warning-soft: rgba(127, 29, 29, 0.42);
       --border: rgba(148, 163, 184, 0.16);
       --border-strong: rgba(148, 163, 184, 0.28);
       --shadow: 0 18px 45px rgba(0, 0, 0, 0.34);
       --radius: 16px;
-      --ui: "Segoe UI", Arial, Helvetica, sans-serif;
-      --mono: "Cascadia Code", Consolas, "Lucida Console", "Courier New", monospace;
-      --logo-font: "Lucida Console", "Cascadia Code", Consolas, "Courier New", monospace;
+      --ui: 'Segoe UI', Arial, Helvetica, sans-serif;
+      --mono: 'Cascadia Code', Consolas, 'Lucida Console', 'Courier New', monospace;
+      --logo-font: 'Lucida Console', 'Cascadia Code', Consolas, 'Courier New', monospace;
     }
+
+    body.light-theme {
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --panel-deep: #eef2f7;
+      --text: #111827;
+      --text-soft: #1f2937;
+      --muted: #64748b;
+      --title: #0f172a;
+      --input-bg: #ffffff;
+      --accent: #8a8800;
+      --accent-soft: rgba(138, 136, 0, 0.12);
+      --blue-soft: rgba(2, 132, 199, 0.11);
+      --green-soft: rgba(22, 163, 74, 0.12);
+      --red-soft: rgba(220, 38, 38, 0.10);
+      --warning-soft: rgba(254, 226, 226, 0.92);
+      --border: rgba(100, 116, 139, 0.26);
+      --border-strong: rgba(71, 85, 105, 0.38);
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+    }
+
     * {
       box-sizing: border-box;
     }
+
     html,
     body {
       max-width: 100%;
       overflow-x: hidden;
     }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -55,17 +70,27 @@
       color: var(--text);
       padding: 14px;
     }
+
+    body.light-theme {
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(221, 220, 0, 0.14), transparent 30%),
+        linear-gradient(135deg, #ffffff, var(--bg));
+    }
+
     .app {
       max-width: 1500px;
       margin: 0 auto;
       min-width: 0;
     }
+
     .top-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       margin-bottom: 10px;
     }
+
     .topbar,
     .notes-panel {
       min-height: 78px;
@@ -76,18 +101,26 @@
       box-shadow: var(--shadow);
       min-width: 0;
     }
+
+    body.light-theme .topbar,
+    body.light-theme .notes-panel {
+      background: rgba(255, 255, 255, 0.94);
+    }
+
     .topbar {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
       gap: 14px;
     }
+
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
       min-width: 0;
     }
+
     .logo {
       width: 50px;
       height: 50px;
@@ -110,18 +143,21 @@
         inset 0 0 16px rgba(221, 220, 0, 0.08),
         0 0 20px rgba(221, 220, 0, 0.06);
     }
+
     .title {
       min-width: 0;
     }
+
     .title h1 {
       margin: 0;
       font-size: 25px;
       letter-spacing: -0.04em;
-      color: #f8fafc;
+      color: var(--title);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .title p {
       margin: 3px 0 0;
       color: var(--muted);
@@ -130,6 +166,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .right-tools {
       display: flex;
       align-items: center;
@@ -138,6 +175,7 @@
       flex-wrap: wrap;
       min-width: 0;
     }
+
     .privacy-timer {
       display: flex;
       align-items: center;
@@ -152,27 +190,41 @@
       font-family: var(--mono);
       min-width: 0;
     }
+
     .privacy-timer strong {
       min-width: 48px;
       color: var(--accent);
       font-size: 15px;
       text-align: center;
     }
+
     .privacy-timer.danger {
       background: var(--warning-soft);
       border-color: rgba(239, 68, 68, 0.5);
       color: #fecaca;
       animation: timerBlink 1s infinite;
     }
+
+    body.light-theme .privacy-timer.danger {
+      color: #991b1b;
+    }
+
     .privacy-timer.danger strong {
       color: #fecaca;
     }
+
+    body.light-theme .privacy-timer.danger strong {
+      color: #991b1b;
+    }
+
     @keyframes timerBlink {
       0% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
       50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.42); }
       100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
     }
-    .btn-timer {
+
+    .btn-timer,
+    .btn-theme {
       width: 29px;
       height: 29px;
       padding: 0;
@@ -183,20 +235,21 @@
       font-size: 15px;
       line-height: 1;
     }
-    .btn-clear-inline {
-      color: #fee2e2;
-      background: rgba(127, 29, 29, 0.22);
-      border-color: rgba(239, 68, 68, 0.24);
+
+    body.light-theme .btn-timer,
+    body.light-theme .btn-theme {
+      background: #ffffff;
+      color: #111827;
+      border-color: rgba(100, 116, 139, 0.30);
     }
-    .btn-clear-inline:hover {
-      background: rgba(127, 29, 29, 0.34);
-    }
+
     .notes-panel {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: stretch;
     }
+
     .notes-panel textarea {
       width: 100%;
       min-width: 0;
@@ -211,17 +264,21 @@
       line-height: 1.35;
       outline: none;
     }
+
     .notes-panel textarea::placeholder {
       color: rgba(148, 163, 184, 0.68);
     }
+
     .notes-panel textarea:focus {
       border-color: rgba(56, 189, 248, 0.36);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
     }
+
     .notes-actions {
       display: flex;
       align-items: stretch;
     }
+
     .ticker-row {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -230,60 +287,100 @@
       margin-bottom: 10px;
       min-width: 0;
     }
-    .status-ticker {
-      grid-column: span 3;
+
+    .status-ticker,
+    .clear-all-card,
+    .alpha-card {
       min-height: 72px;
       border-radius: 11px;
       overflow: hidden;
-      background: rgba(7, 16, 31, 0.72);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      color: var(--muted);
       box-shadow: var(--shadow);
+      min-width: 0;
+      border: 1px solid var(--border);
+    }
+
+    .status-ticker {
+      grid-column: span 2;
+      background: rgba(7, 16, 31, 0.72);
+      border-color: rgba(148, 163, 184, 0.12);
+      color: var(--muted);
       display: flex;
       align-items: center;
-      min-width: 0;
       font-family: var(--mono);
       font-size: 14px;
       padding: 0 14px;
     }
+
+    body.light-theme .status-ticker {
+      background: rgba(255, 255, 255, 0.88);
+      border-color: var(--border);
+    }
+
     .status-ticker.success {
       color: #bbf7d0;
       background: var(--green-soft);
       border-color: rgba(34, 197, 94, 0.34);
     }
+
     .status-ticker.warning {
       color: #fde68a;
       background: rgba(245, 158, 11, 0.13);
       border-color: rgba(245, 158, 11, 0.30);
     }
+
     .status-ticker.error {
       color: #fecaca;
       background: var(--red-soft);
       border-color: rgba(239, 68, 68, 0.30);
     }
+
+    body.light-theme .status-ticker.success { color: #166534; }
+    body.light-theme .status-ticker.warning { color: #92400e; }
+    body.light-theme .status-ticker.error { color: #991b1b; }
+
     .status-ticker strong {
       color: var(--accent);
     }
+
+    .clear-all-card {
+      grid-column: span 1;
+      background: rgba(21, 31, 50, 0.82);
+      display: flex;
+      align-items: stretch;
+      padding: 8px;
+    }
+
+    body.light-theme .clear-all-card,
+    body.light-theme .alpha-card,
+    body.light-theme .column {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .btn-clear-all {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
     .alpha-card {
       grid-column: span 1;
-      min-height: 72px;
-      min-width: 0;
       width: 100%;
       max-width: 100%;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
       grid-template-areas:
-        "label label label"
-        "output copy hd";
+        'label label label'
+        'output copy hd';
       align-items: center;
       gap: 6px;
       padding: 8px;
-      border-radius: 11px;
       background: rgba(21, 31, 50, 0.82);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
     }
+
     .alpha-label {
       grid-area: label;
       color: var(--text-soft);
@@ -294,15 +391,11 @@
       text-overflow: ellipsis;
       min-width: 0;
     }
-    .alpha-output {
-      grid-area: output;
-    }
-    .alpha-copy {
-      grid-area: copy;
-    }
-    .alpha-hd {
-      grid-area: hd;
-    }
+
+    .alpha-output { grid-area: output; }
+    .alpha-copy { grid-area: copy; }
+    .alpha-hd { grid-area: hd; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(210px, 1fr));
@@ -310,6 +403,7 @@
       align-items: start;
       min-width: 0;
     }
+
     .column {
       background: rgba(21, 31, 50, 0.94);
       border: 1px solid var(--border);
@@ -319,10 +413,16 @@
       min-height: 100%;
       min-width: 0;
     }
+
     .column:hover {
       border-color: var(--border-strong);
       background: rgba(27, 39, 64, 0.95);
     }
+
+    body.light-theme .column:hover {
+      background: #ffffff;
+    }
+
     .column-header {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -330,15 +430,17 @@
       gap: 8px;
       margin-bottom: 7px;
     }
+
     .column-title h2 {
       margin: 0;
       font-size: 17px;
-      color: #f8fafc;
+      color: var(--title);
       letter-spacing: -0.03em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .btn-column-clear {
       width: 32px;
       height: 30px;
@@ -349,6 +451,7 @@
       border: 1px solid var(--border);
       font-size: 15px;
     }
+
     .number-input {
       width: 100%;
       min-width: 0;
@@ -356,20 +459,23 @@
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--panel-deep);
-      color: #ffffff;
+      color: var(--text);
       font-size: 19px;
       font-family: var(--mono);
       letter-spacing: 0.04em;
       outline: none;
       margin-bottom: 4px;
     }
+
     .number-input:focus {
       border-color: rgba(221, 220, 0, 0.48);
       box-shadow: 0 0 0 3px rgba(221, 220, 0, 0.08);
     }
+
     .number-input::placeholder {
       color: rgba(148, 163, 184, 0.58);
     }
+
     .input-info {
       display: flex;
       justify-content: space-between;
@@ -379,11 +485,13 @@
       margin-bottom: 6px;
       line-height: 1.15;
     }
+
     .command-area {
       display: flex;
       flex-direction: column;
       gap: 5px;
     }
+
     .command-row {
       padding: 6px;
       border-radius: 10px;
@@ -391,86 +499,91 @@
       border: 1px solid rgba(148, 163, 184, 0.10);
       min-width: 0;
     }
+
+    body.light-theme .command-row {
+      background: #f8fafc;
+      border-color: rgba(100, 116, 139, 0.20);
+    }
+
     .command-row.tone-green {
       background: rgba(20, 83, 45, 0.26);
       border-color: rgba(34, 197, 94, 0.22);
     }
+
     .command-row.tone-orange {
       background: rgba(154, 52, 18, 0.30);
       border-color: rgba(251, 146, 60, 0.34);
     }
+
     .command-row.tone-purple {
       background: rgba(88, 28, 135, 0.30);
       border-color: rgba(192, 132, 252, 0.34);
     }
+
     .command-row.tone-blue {
       background: rgba(12, 74, 110, 0.32);
       border-color: rgba(56, 189, 248, 0.34);
     }
+
     .command-row.tone-yellow {
       background: rgba(113, 63, 18, 0.32);
       border-color: rgba(253, 224, 71, 0.34);
     }
+
+    body.light-theme .command-row.tone-green { background: rgba(22, 163, 74, 0.13); }
+    body.light-theme .command-row.tone-orange { background: rgba(249, 115, 22, 0.14); }
+    body.light-theme .command-row.tone-purple { background: rgba(126, 34, 206, 0.12); }
+    body.light-theme .command-row.tone-blue { background: rgba(2, 132, 199, 0.12); }
+    body.light-theme .command-row.tone-yellow { background: rgba(202, 138, 4, 0.15); }
+
     .command-row.tone-green .command-label { color: #bbf7d0; }
     .command-row.tone-orange .command-label { color: #fed7aa; }
     .command-row.tone-purple .command-label { color: #e9d5ff; }
     .command-row.tone-blue .command-label { color: #bae6fd; }
     .command-row.tone-yellow .command-label { color: #fef08a; }
-    .command-row.flash-green {
-      animation: commandFlashGreen 650ms ease-out 1;
-    }
-    .command-row.flash-orange {
-      animation: commandFlashOrange 750ms ease-out 1;
-    }
-    .command-row.flash-purple {
-      animation: commandFlashPurple 750ms ease-out 1;
-    }
-    .command-row.flash-blue {
-      animation: commandFlashBlue 750ms ease-out 1;
-    }
-    .command-row.flash-yellow {
-      animation: commandFlashYellow 750ms ease-out 1;
-    }
+
+    body.light-theme .command-row.tone-green .command-label { color: #166534; }
+    body.light-theme .command-row.tone-orange .command-label { color: #9a3412; }
+    body.light-theme .command-row.tone-purple .command-label { color: #6b21a8; }
+    body.light-theme .command-row.tone-blue .command-label { color: #075985; }
+    body.light-theme .command-row.tone-yellow .command-label { color: #854d0e; }
+
+    .command-row.flash-green { animation: commandFlashGreen 650ms ease-out 1; }
+    .command-row.flash-orange { animation: commandFlashOrange 750ms ease-out 1; }
+    .command-row.flash-purple { animation: commandFlashPurple 750ms ease-out 1; }
+    .command-row.flash-blue { animation: commandFlashBlue 750ms ease-out 1; }
+    .command-row.flash-yellow { animation: commandFlashYellow 750ms ease-out 1; }
+
     @keyframes commandFlashGreen {
       0% { background: rgba(20, 83, 45, 0.26); }
-      25% {
-        background: rgba(20, 83, 45, 0.90);
-        border-color: rgba(34, 197, 94, 0.78);
-      }
+      25% { background: rgba(20, 83, 45, 0.90); border-color: rgba(34, 197, 94, 0.78); }
       100% { background: rgba(20, 83, 45, 0.26); }
     }
+
     @keyframes commandFlashOrange {
       0% { background: rgba(154, 52, 18, 0.30); }
-      25% {
-        background: rgba(234, 88, 12, 0.95);
-        border-color: rgba(251, 146, 60, 0.92);
-      }
+      25% { background: rgba(234, 88, 12, 0.95); border-color: rgba(251, 146, 60, 0.92); }
       100% { background: rgba(154, 52, 18, 0.30); }
     }
+
     @keyframes commandFlashPurple {
       0% { background: rgba(88, 28, 135, 0.30); }
-      25% {
-        background: rgba(126, 34, 206, 0.95);
-        border-color: rgba(192, 132, 252, 0.92);
-      }
+      25% { background: rgba(126, 34, 206, 0.95); border-color: rgba(192, 132, 252, 0.92); }
       100% { background: rgba(88, 28, 135, 0.30); }
     }
+
     @keyframes commandFlashBlue {
       0% { background: rgba(12, 74, 110, 0.32); }
-      25% {
-        background: rgba(2, 132, 199, 0.95);
-        border-color: rgba(56, 189, 248, 0.92);
-      }
+      25% { background: rgba(2, 132, 199, 0.95); border-color: rgba(56, 189, 248, 0.92); }
       100% { background: rgba(12, 74, 110, 0.32); }
     }
+
     @keyframes commandFlashYellow {
       0% { background: rgba(113, 63, 18, 0.32); }
-      25% {
-        background: rgba(202, 138, 4, 0.95);
-        border-color: rgba(253, 224, 71, 0.92);
-      }
+      25% { background: rgba(202, 138, 4, 0.95); border-color: rgba(253, 224, 71, 0.92); }
       100% { background: rgba(113, 63, 18, 0.32); }
     }
+
     .command-label {
       margin-bottom: 3px;
       font-size: 11.5px;
@@ -480,15 +593,18 @@
       user-select: none;
       line-height: 1.15;
     }
+
     .command-label:hover {
       color: var(--accent);
     }
+
     .command-controls {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 5px;
       min-width: 0;
     }
+
     .command-output,
     .alpha-output {
       width: 100%;
@@ -496,21 +612,29 @@
       padding: 6px 8px;
       border-radius: 8px;
       border: 1px solid rgba(148, 163, 184, 0.13);
-      background: #020617;
+      background: var(--input-bg);
       color: var(--accent);
       font-family: var(--mono);
       font-size: 13px;
       outline: none;
       cursor: copy;
     }
+
+    body.light-theme .command-output,
+    body.light-theme .alpha-output {
+      border-color: rgba(100, 116, 139, 0.24);
+    }
+
     .command-output:focus,
     .alpha-output:focus {
       border-color: rgba(56, 189, 248, 0.38);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
     }
+
     .command-output::placeholder {
       color: rgba(148, 163, 184, 0.32);
     }
+
     button {
       border: none;
       border-radius: 8px;
@@ -526,36 +650,52 @@
       white-space: nowrap;
       font-family: var(--ui);
     }
-    button:hover {
-      transform: translateY(-1px);
-    }
-    button:active {
-      transform: translateY(0);
-    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
     .btn-copy {
       background: var(--blue-soft);
       color: #e0f2fe;
       border: 1px solid rgba(56, 189, 248, 0.30);
     }
+
+    body.light-theme .btn-copy {
+      color: #075985;
+    }
+
     .btn-copy:hover {
       background: rgba(56, 189, 248, 0.22);
     }
+
     .btn-hd {
       background: var(--accent-soft);
       color: #fef9c3;
       border: 1px solid rgba(221, 220, 0, 0.28);
     }
+
+    body.light-theme .btn-hd {
+      color: #713f12;
+    }
+
     .btn-hd:hover {
       background: rgba(221, 220, 0, 0.20);
     }
+
     .btn-danger {
       background: var(--red-soft);
       color: #fecaca;
       border: 1px solid rgba(239, 68, 68, 0.24);
     }
+
+    body.light-theme .btn-danger {
+      color: #991b1b;
+    }
+
     .btn-danger:hover {
       background: rgba(239, 68, 68, 0.20);
     }
+
     .footer {
       margin-top: 10px;
       padding: 10px 12px;
@@ -566,157 +706,190 @@
       background: rgba(7, 16, 31, 0.45);
       border: 1px solid rgba(148, 163, 184, 0.10);
     }
+
+    body.light-theme .footer {
+      background: rgba(255, 255, 255, 0.76);
+      border-color: var(--border);
+    }
+
     .footer strong {
       color: var(--text-soft);
       font-weight: 700;
     }
+
     @media (max-width: 1100px) {
-      .top-layout {
-        grid-template-columns: 1fr;
-      }
+      .top-layout,
       .ticker-row {
         grid-template-columns: 1fr;
       }
+
       .status-ticker,
+      .clear-all-card,
       .alpha-card {
         grid-column: auto;
       }
     }
+
     @media (max-width: 980px) {
       .grid {
         grid-template-columns: repeat(2, minmax(210px, 1fr));
       }
+
       .topbar {
         grid-template-columns: 1fr;
       }
+
       .right-tools {
         justify-content: flex-start;
       }
     }
+
     @media (max-width: 580px) {
-      body {
-        padding: 9px;
-      }
+      body { padding: 9px; }
+
       .grid {
         grid-template-columns: 1fr;
       }
-      .brand {
-        min-width: 0;
-      }
-      .title h1 {
-        font-size: 22px;
-      }
-      .command-controls {
-        grid-template-columns: minmax(0, 1fr) auto auto;
-      }
+
+      .brand { min-width: 0; }
+      .title h1 { font-size: 22px; }
+      .command-controls { grid-template-columns: minmax(0, 1fr) auto auto; }
+
       .alpha-card {
         grid-template-columns: minmax(0, 1fr) auto auto;
         grid-template-areas:
-          "label label label"
-          "output copy hd";
+          'label label label'
+          'output copy hd';
       }
+
       .privacy-timer {
         width: 100%;
         justify-content: center;
       }
+
       .notes-panel {
         grid-template-columns: 1fr;
       }
+
       .notes-actions {
         justify-content: stretch;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="top-layout">
-      <header class="topbar">
-        <div class="brand">
-          <div class="logo">DBD</div>
-          <div class="title">
+  <div class='app'>
+
+    <div class='top-layout'>
+      <header class='topbar'>
+        <div class='brand'>
+          <div class='logo'>DBD</div>
+
+          <div class='title'>
             <h1>DBD-Assistent</h1>
             <p>Effizientes Kopieren von Befehlen</p>
           </div>
         </div>
-        <div class="right-tools">
-          <div id="privacyTimerBox" class="privacy-timer">
+
+        <div class='right-tools'>
+          <div id='privacyTimerBox' class='privacy-timer'>
             <span>Auto-Clear</span>
-            <strong id="privacyTimer">10:00</strong>
+            <strong id='privacyTimer'>10:00</strong>
+
             <button
-              class="btn-timer"
-              onclick="resetPrivacyTimer()"
-              title="Timer wieder auf 10 Minuten setzen"
+              class='btn-timer'
+              onclick='resetPrivacyTimer()'
+              title='Timer wieder auf 10 Minuten setzen'
             >
               🔄
             </button>
+
             <button
-              class="btn-timer btn-clear-inline"
-              onclick="manualClearNumbers()"
-              title="Alle Nummern löschen. Notizen bleiben erhalten."
+              id='themeToggle'
+              class='btn-theme'
+              onclick='toggleTheme()'
+              title='Helle Darstellung einschalten'
             >
-              ♻️
+              ☀️
             </button>
           </div>
         </div>
       </header>
-      <section class="notes-panel">
+
+      <section class='notes-panel'>
         <textarea
-          id="notes"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht."
+          id='notes'
+          autocomplete='off'
+          autocorrect='off'
+          autocapitalize='off'
+          spellcheck='false'
+          placeholder='Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht.'
         ></textarea>
-        <div class="notes-actions">
-          <button class="btn-danger" onclick="clearNotes()" title="Notizen löschen">
+
+        <div class='notes-actions'>
+          <button class='btn-danger' onclick='clearNotes()' title='Notizen löschen'>
             🧹 Clear
           </button>
         </div>
       </section>
     </div>
-    <div class="ticker-row">
-      <section id="statusTicker" class="status-ticker">
-        <span id="statusText">
+
+    <div class='ticker-row'>
+      <section id='statusTicker' class='status-ticker'>
+        <span id='statusText'>
           <strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
         </span>
       </section>
-      <section class="alpha-card">
-        <div class="alpha-label">Alpha-Abfrage</div>
+
+      <section class='clear-all-card'>
+        <button class='btn-danger btn-clear-all' onclick='manualClearNumbers()' title='Alle Nummern löschen. Notizen bleiben erhalten.'>
+          ♻️ Alle Nummern löschen
+        </button>
+      </section>
+
+      <section class='alpha-card'>
+        <div class='alpha-label'>Alpha-Abfrage</div>
+
         <input
-          id="alpha-command"
-          class="alpha-output"
-          value="70anz090"
+          id='alpha-command'
+          class='alpha-output'
+          value='70anz090'
           readonly
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          ondblclick="copyStaticCommand('alpha-command', false)"
-          title="Doppelklick: Befehl kopieren"
+          autocomplete='off'
+          autocorrect='off'
+          autocapitalize='off'
+          spellcheck='false'
+          ondblclick='copyStaticCommand(&apos;alpha-command&apos;, false)'
+          title='Doppelklick: Befehl kopieren'
         />
+
         <button
-          class="btn-copy alpha-copy"
-          onclick="copyStaticCommand('alpha-command', false)"
-          title="Befehl kopieren"
+          class='btn-copy alpha-copy'
+          onclick='copyStaticCommand(&apos;alpha-command&apos;, false)'
+          title='Befehl kopieren'
         >
           Copy
         </button>
+
         <button
-          class="btn-hd alpha-hd"
-          onclick="copyStaticCommand('alpha-command', true)"
-          title="Befehl mit hd am Anfang kopieren"
+          class='btn-hd alpha-hd'
+          onclick='copyStaticCommand(&apos;alpha-command&apos;, true)'
+          title='Befehl mit hd am Anfang kopieren'
         >
           HD
         </button>
       </section>
     </div>
-    <main id="grid" class="grid"></main>
-    <footer class="footer">
-      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="currentYear"></span> · Version 0.2.1
+
+    <main id='grid' class='grid'></main>
+
+    <footer class='footer'>
+      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id='currentYear'></span> · Version 0.3
     </footer>
+
   </div>
+
   <script>
     /*
       RU: Основные настройки программы.
@@ -724,379 +897,376 @@
     */
     const PRIVACY_TIMER_START_SECONDS = 10 * 60;
     const STATUS_RESET_DELAY = 3000;
+
     const DEFAULT_STATUS_HTML =
-      "<strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren";
+      '<strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren';
+
     const columns = [
       {
-        id: "depot",
-        title: "Depotnummer",
-        placeholder: "10 Zeichen",
+        id: 'depot',
+        title: 'Depotnummer',
+        placeholder: '10 Zeichen',
         commands: [
-          {
-            label: "Grundbefehl",
-            prefix: "90anz091",
-            tone: "green"
-          },
-          {
-            label: "Sperren anzeigen",
-            prefix: "11anz213"
-          },
-          {
-            label: "Sperre setzen",
-            prefix: "11neu213"
-          },
-          {
-            label: "Sperre löschen",
-            prefix: "11loe213",
-            tone: "orange"
-          },
-          {
-            label: "Sperre ändern",
-            prefix: "11aen213"
-          },
-          {
-            label: "Rollen (Person) anzeigen",
-            prefix: "10anz113",
-            tone: "purple"
-          },
-          {
-            label: "Eheverbund/Einzel PID anzeigen",
-            prefix: "70anz030"
-          },
-          {
-            label: "Hinweistexte anzeigen",
-            prefix: "10anz013"
-          },
-          {
-            label: "Hinweistexte ändern/löschen",
-            prefix: "10aen013",
-            tone: "blue"
-          },
-          {
-            label: "Hinweistexte setzen",
-            prefix: "10neu013"
-          },
-          {
-            label: "FSA Zukunft anzeigen",
-            prefix: "70anz040"
-          },
-          {
-            label: "FSA Vorjahr anzeigen",
-            prefix: "70anz042"
-          },
-          {
-            label: "Bankverbindung",
-            prefix: "10anz012"
-          }
+          { label: 'Grundbefehl', prefix: '90anz091', tone: 'green' },
+
+          { label: 'Sperren anzeigen', prefix: '11anz213' },
+          { label: 'Sperre setzen', prefix: '11neu213' },
+          { label: 'Sperre löschen', prefix: '11loe213', tone: 'orange' },
+          { label: 'Sperre ändern', prefix: '11aen213' },
+
+          { label: 'Rollen (Person) anzeigen', prefix: '10anz113', tone: 'purple' },
+          { label: 'Eheverbund/Einzel PID anzeigen', prefix: '70anz030' },
+
+          { label: 'Hinweistexte anzeigen', prefix: '10anz013' },
+          { label: 'Hinweistexte ändern/löschen', prefix: '10aen013', tone: 'blue' },
+          { label: 'Hinweistexte setzen', prefix: '10neu013' },
+
+          { label: 'FSA Zukunft anzeigen', prefix: '70anz040' },
+          { label: 'FSA Vorjahr anzeigen', prefix: '70anz042' },
+
+          { label: 'Bankverbindung', prefix: '10anz012' }
         ]
       },
       {
-        id: "pid1",
-        title: "PID 1",
-        placeholder: "10 Zeichen",
+        id: 'pid1',
+        title: 'PID 1',
+        placeholder: '10 Zeichen',
         commands: [
-          {
-            label: "Personendaten anzeigen",
-            prefix: "70anz010"
-          },
-          {
-            label: "Personendaten ändern",
-            prefix: "70k  010",
-            tone: "yellow"
-          },
-          {
-            label: "Kontaktdaten",
-            prefix: "70anz060"
-          },
-          {
-            label: "AGB ETF",
-            prefix: "70anz080"
-          }
+          { label: 'Personendaten anzeigen', prefix: '70anz010' },
+          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
+          { label: 'Kontaktdaten', prefix: '70anz060' },
+          { label: 'AGB ETF', prefix: '70anz080' }
         ]
       },
       {
-        id: "pid2",
-        title: "PID 2",
-        placeholder: "10 Zeichen",
+        id: 'pid2',
+        title: 'PID 2',
+        placeholder: '10 Zeichen',
         commands: [
-          {
-            label: "Personendaten anzeigen",
-            prefix: "70anz010"
-          },
-          {
-            label: "Personendaten ändern",
-            prefix: "70k  010",
-            tone: "yellow"
-          },
-          {
-            label: "Kontaktdaten",
-            prefix: "70anz060"
-          },
-          {
-            label: "AGB ETF",
-            prefix: "70anz080"
-          }
+          { label: 'Personendaten anzeigen', prefix: '70anz010' },
+          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
+          { label: 'Kontaktdaten', prefix: '70anz060' },
+          { label: 'AGB ETF', prefix: '70anz080' }
         ]
       },
       {
-        id: "pid3",
-        title: "PID 3",
-        placeholder: "10 Zeichen",
+        id: 'pid3',
+        title: 'PID 3',
+        placeholder: '10 Zeichen',
         commands: [
-          {
-            label: "Personendaten anzeigen",
-            prefix: "70anz010"
-          },
-          {
-            label: "Personendaten ändern",
-            prefix: "70k  010",
-            tone: "yellow"
-          },
-          {
-            label: "Kontaktdaten",
-            prefix: "70anz060"
-          },
-          {
-            label: "AGB ETF",
-            prefix: "70anz080"
-          }
+          { label: 'Personendaten anzeigen', prefix: '70anz010' },
+          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
+          { label: 'Kontaktdaten', prefix: '70anz060' },
+          { label: 'AGB ETF', prefix: '70anz080' }
         ]
       }
     ];
-    const grid = document.getElementById("grid");
-    const statusTicker = document.getElementById("statusTicker");
-    const statusText = document.getElementById("statusText");
+
+    const grid = document.getElementById('grid');
+    const statusTicker = document.getElementById('statusTicker');
+    const statusText = document.getElementById('statusText');
+    const themeToggle = document.getElementById('themeToggle');
+
     let privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
     let privacyTimerInterval = null;
     let statusResetTimer = null;
+    let isLightTheme = false;
+
     function createInterface() {
       columns.forEach(column => {
-        const columnElement = document.createElement("section");
-        columnElement.className = "column";
+        const columnElement = document.createElement('section');
+        columnElement.className = 'column';
         columnElement.dataset.columnId = column.id;
+
         columnElement.innerHTML = `
-          <div class="column-header">
-            <div class="column-title">
+          <div class='column-header'>
+            <div class='column-title'>
               <h2>${column.title}</h2>
             </div>
+
             <button
-              id="${column.id}-clear"
-              class="btn-column-clear"
-              onclick="clearColumn('${column.id}')"
-              title="Spalte leeren"
+              id='${column.id}-clear'
+              class='btn-column-clear'
+              onclick='clearColumn(&apos;${column.id}&apos;)'
+              title='Spalte leeren'
             >
               ♻️
             </button>
           </div>
+
           <input
-            id="${column.id}-input"
-            class="number-input"
-            maxlength="10"
-            placeholder="${column.placeholder}"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
+            id='${column.id}-input'
+            class='number-input'
+            maxlength='10'
+            placeholder='${column.placeholder}'
+            autocomplete='off'
+            autocorrect='off'
+            autocapitalize='off'
+            spellcheck='false'
           />
-          <div class="input-info">
+
+          <div class='input-info'>
             <span>Max. 10 Zeichen</span>
-            <span id="${column.id}-counter">0 / 10</span>
+            <span id='${column.id}-counter'>0 / 10</span>
           </div>
-          <div class="command-area">
+
+          <div class='command-area'>
             ${column.commands.map((command, index) => {
-              const toneClass = command.tone ? `tone-${command.tone}` : "";
-              const flashClass = command.tone ? `flash-${command.tone}` : "";
+              const toneClass = command.tone ? `tone-${command.tone}` : '';
+              const flashClass = command.tone ? `flash-${command.tone}` : '';
+
               return `
                 <div
-                  class="command-row ${toneClass}"
-                  data-flash-class="${flashClass}"
+                  class='command-row ${toneClass}'
+                  data-flash-class='${flashClass}'
                 >
                   <div
-                    class="command-label"
-                    ondblclick="copyCommand('${column.id}-command-${index}', false)"
-                    title="Doppelklick: Befehl kopieren"
+                    class='command-label'
+                    ondblclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
+                    title='Doppelklick: Befehl kopieren'
                   >
                     ${command.label}
                   </div>
-                  <div class="command-controls">
+
+                  <div class='command-controls'>
                     <input
-                      id="${column.id}-command-${index}"
-                      class="command-output"
-                      value=""
-                      placeholder="${command.prefix}..."
+                      id='${column.id}-command-${index}'
+                      class='command-output'
+                      value=''
+                      placeholder='${command.prefix}...'
                       readonly
-                      autocomplete="off"
-                      autocorrect="off"
-                      autocapitalize="off"
-                      spellcheck="false"
-                      ondblclick="copyCommand('${column.id}-command-${index}', false)"
-                      title="Doppelklick: Befehl kopieren"
+                      autocomplete='off'
+                      autocorrect='off'
+                      autocapitalize='off'
+                      spellcheck='false'
+                      ondblclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
+                      title='Doppelklick: Befehl kopieren'
                     />
+
                     <button
-                      class="btn-copy"
-                      onclick="copyCommand('${column.id}-command-${index}', false)"
-                      title="Befehl kopieren"
+                      class='btn-copy'
+                      onclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
+                      title='Befehl kopieren'
                     >
                       Copy
                     </button>
+
                     <button
-                      class="btn-hd"
-                      onclick="copyCommand('${column.id}-command-${index}', true)"
-                      title="Befehl mit hd am Anfang kopieren"
+                      class='btn-hd'
+                      onclick='copyCommand(&apos;${column.id}-command-${index}&apos;, true)'
+                      title='Befehl mit hd am Anfang kopieren'
                     >
                       HD
                     </button>
                   </div>
                 </div>
               `;
-            }).join("")}
+            }).join('')}
           </div>
         `;
+
         grid.appendChild(columnElement);
+
         const input = document.getElementById(`${column.id}-input`);
-        input.addEventListener("input", () => {
+
+        input.addEventListener('input', () => {
           input.value = cleanValue(input.value);
           updateColumn(column);
           silentlyResetPrivacyTimer();
         });
-        input.addEventListener("focus", () => {
+
+        input.addEventListener('focus', () => {
           input.select();
         });
-        input.addEventListener("click", () => {
+
+        input.addEventListener('click', () => {
           input.select();
         });
       });
     }
+
     function getColumn(columnId) {
       return columns.find(column => column.id === columnId);
     }
+
     function cleanValue(value) {
       /*
         RU: Оставляем первые 10 символов и убираем пробелы по краям.
         DE: Es bleiben die ersten 10 Zeichen, äußere Leerzeichen werden entfernt.
       */
-      return String(value || "").trim().slice(0, 10);
+      return String(value || '').trim().slice(0, 10);
     }
+
     function updateColumn(column) {
       const input = document.getElementById(`${column.id}-input`);
       const counter = document.getElementById(`${column.id}-counter`);
       const value = input.value.trim();
+
       counter.textContent = `${value.length} / 10`;
+
       column.commands.forEach((command, index) => {
         const output = document.getElementById(`${column.id}-command-${index}`);
-        output.value = value ? `${command.prefix}${value}` : "";
+        output.value = value ? `${command.prefix}${value}` : '';
       });
     }
+
     function clearColumn(columnId) {
       const column = getColumn(columnId);
       const input = document.getElementById(`${columnId}-input`);
+
       if (!column || !input) {
         return;
       }
-      input.value = "";
+
+      input.value = '';
       updateColumn(column);
       silentlyResetPrivacyTimer();
-      setStatus(`${column.title} geleert.`, "warning");
+      setStatus(`${column.title} geleert.`, 'warning');
     }
+
     async function copyText(text) {
       if (!text) {
-        setStatus("Nichts zu kopieren.", "warning");
+        setStatus('Nichts zu kopieren.', 'warning');
         return false;
       }
+
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(text);
         } else {
           fallbackCopy(text);
         }
-        setStatus(`Kopiert: ${text}`, "success");
+
+        setStatus(`Kopiert: ${text}`, 'success');
         return true;
       } catch (error) {
         try {
           fallbackCopy(text);
-          setStatus(`Kopiert: ${text}`, "success");
+          setStatus(`Kopiert: ${text}`, 'success');
           return true;
         } catch (fallbackError) {
-          setStatus("Kopieren fehlgeschlagen.", "error");
+          setStatus('Kopieren fehlgeschlagen.', 'error');
           return false;
         }
       }
     }
+
     function fallbackCopy(text) {
-      const textarea = document.createElement("textarea");
+      const textarea = document.createElement('textarea');
       textarea.value = text;
-      textarea.style.position = "fixed";
-      textarea.style.left = "-9999px";
-      textarea.style.top = "-9999px";
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '-9999px';
+
       document.body.appendChild(textarea);
       textarea.focus();
       textarea.select();
-      document.execCommand("copy");
+
+      document.execCommand('copy');
       document.body.removeChild(textarea);
     }
+
     async function copyCommand(elementId, withHD) {
       const field = document.getElementById(elementId);
       const baseCommand = field.value;
+
       if (!baseCommand) {
-        setStatus("Erst Nummer einfügen.", "warning");
+        setStatus('Erst Nummer einfügen.', 'warning');
         return;
       }
+
       const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
       const copied = await copyText(finalCommand);
+
       if (copied) {
         flashCommandRow(field);
         silentlyResetPrivacyTimer();
       }
     }
+
     async function copyStaticCommand(elementId, withHD) {
       const field = document.getElementById(elementId);
       const baseCommand = field.value;
       const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
+
       await copyText(finalCommand);
       silentlyResetPrivacyTimer();
     }
+
     function flashCommandRow(field) {
-      const row = field.closest(".command-row");
+      const row = field.closest('.command-row');
+
       if (!row) {
         return;
       }
+
       const flashClass = row.dataset.flashClass;
+
       if (!flashClass) {
         return;
       }
+
       row.classList.remove(flashClass);
+
       /*
         RU: Reflow нужен, чтобы повторная анимация запускалась каждый раз.
         DE: Reflow sorgt dafür, dass die Animation jedes Mal neu startet.
       */
       void row.offsetWidth;
+
       row.classList.add(flashClass);
+
       setTimeout(() => {
         row.classList.remove(flashClass);
       }, 800);
     }
+
     function clearNotes() {
-      document.getElementById("notes").value = "";
-      setStatus("Notizen gelöscht.", "warning");
+      document.getElementById('notes').value = '';
+      setStatus('Notizen gelöscht.', 'warning');
     }
+
     function setStatus(message, type) {
       clearTimeout(statusResetTimer);
-      statusTicker.className = "status-ticker";
+
+      statusTicker.className = 'status-ticker';
+
       if (type) {
         statusTicker.classList.add(type);
       }
+
       statusText.textContent = `Status: ${message}`;
+
       statusResetTimer = setTimeout(() => {
-        statusTicker.className = "status-ticker";
+        statusTicker.className = 'status-ticker';
         statusText.innerHTML = DEFAULT_STATUS_HTML;
       }, STATUS_RESET_DELAY);
     }
+
+    function toggleTheme() {
+      /*
+        RU: Тема меняется только в текущей вкладке и не сохраняется в браузере.
+        DE: Die Darstellung wird nur im aktuellen Tab geändert und nicht im Browser gespeichert.
+      */
+      isLightTheme = !isLightTheme;
+      document.body.classList.toggle('light-theme', isLightTheme);
+
+      themeToggle.textContent = isLightTheme ? '🌙' : '☀️';
+      themeToggle.title = isLightTheme
+        ? 'Dunkle Darstellung einschalten'
+        : 'Helle Darstellung einschalten';
+
+      setStatus(isLightTheme ? 'Helle Darstellung aktiviert.' : 'Dunkle Darstellung aktiviert.', 'success');
+    }
+
     function formatMinutesSeconds(seconds) {
       const safeSeconds = Math.max(0, seconds);
       const minutes = Math.floor(safeSeconds / 60);
       const restSeconds = safeSeconds % 60;
-      return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
+
+      return `${String(minutes).padStart(2, '0')}:${String(restSeconds).padStart(2, '0')}`;
     }
+
     function getPrivacySecondsLeft() {
       /*
         RU: Таймер считается по реальному времени, а не по количеству тиков.
@@ -1104,71 +1274,88 @@
       */
       return Math.max(0, Math.ceil((privacyDeadlineAt - Date.now()) / 1000));
     }
+
     function updatePrivacyTimerView() {
-      const timer = document.getElementById("privacyTimer");
-      const timerBox = document.getElementById("privacyTimerBox");
+      const timer = document.getElementById('privacyTimer');
+      const timerBox = document.getElementById('privacyTimerBox');
       const secondsLeft = getPrivacySecondsLeft();
+
       timer.textContent = formatMinutesSeconds(secondsLeft);
+
       if (secondsLeft <= 60) {
-        timerBox.classList.add("danger");
+        timerBox.classList.add('danger');
       } else {
-        timerBox.classList.remove("danger");
+        timerBox.classList.remove('danger');
       }
     }
+
     function handlePrivacyTimerTick() {
       const secondsLeft = getPrivacySecondsLeft();
+
       if (secondsLeft <= 0) {
         clearSensitiveData();
-        setStatus("Nummern automatisch gelöscht.", "warning");
+        setStatus('Nummern automatisch gelöscht.', 'warning');
         return;
       }
+
       updatePrivacyTimerView();
     }
+
     function startPrivacyTimer() {
       clearInterval(privacyTimerInterval);
       handlePrivacyTimerTick();
       privacyTimerInterval = setInterval(handlePrivacyTimerTick, 1000);
     }
+
     function resetPrivacyTimer() {
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
-      setStatus("Timer zurückgesetzt.", "success");
+      setStatus('Timer zurückgesetzt.', 'success');
     }
+
     function silentlyResetPrivacyTimer() {
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
     }
+
     function clearSensitiveData() {
       /*
         RU: Заметки не очищаются. Очищаются только номера и команды.
         DE: Notizen bleiben erhalten. Nur Nummern und Befehle werden geleert.
       */
-      document.querySelectorAll(".number-input").forEach(input => {
-        input.value = "";
+      document.querySelectorAll('.number-input').forEach(input => {
+        input.value = '';
       });
+
       columns.forEach(column => {
         updateColumn(column);
       });
+
       privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
       updatePrivacyTimerView();
     }
+
     function manualClearNumbers() {
       clearSensitiveData();
-      setStatus("Nummern gelöscht. Notizen bleiben erhalten.", "warning");
+      setStatus('Nummern gelöscht. Notizen bleiben erhalten.', 'warning');
     }
+
     function setCurrentYear() {
-      document.getElementById("currentYear").textContent = new Date().getFullYear();
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
     }
+
     /*
       RU: При возвращении во вкладку таймер сразу проверяет реальное прошедшее время.
       DE: Beim Zurückkehren in den Tab prüft der Timer sofort die tatsächlich vergangene Zeit.
     */
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
         handlePrivacyTimerTick();
       }
     });
-    window.addEventListener("focus", handlePrivacyTimerTick);
+
+    window.addEventListener('focus', handlePrivacyTimerTick);
+
     createInterface();
     startPrivacyTimer();
     setCurrentYear();
