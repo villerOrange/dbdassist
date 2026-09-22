@@ -1,1364 +1,243 @@
 <!DOCTYPE html>
-<html lang='de'>
+<html lang="de">
 <head>
-  <meta charset='UTF-8' />
-  <title>DBD-Assistent</title>
-
-  <style>
-    :root {
-      --bg: #0b1120;
-      --panel: #151f32;
-      --panel-deep: #07101f;
-      --text: #e5e7eb;
-      --text-soft: #cbd5e1;
-      --muted: #94a3b8;
-      --title: #f8fafc;
-      --input-bg: #020617;
-      --accent: #dddc00;
-      --accent-soft: rgba(221, 220, 0, 0.14);
-      --blue-soft: rgba(56, 189, 248, 0.14);
-      --green-soft: rgba(34, 197, 94, 0.13);
-      --red-soft: rgba(239, 68, 68, 0.13);
-      --warning-soft: rgba(127, 29, 29, 0.42);
-      --border: rgba(148, 163, 184, 0.16);
-      --border-strong: rgba(148, 163, 184, 0.28);
-      --shadow: 0 18px 45px rgba(0, 0, 0, 0.34);
-      --radius: 16px;
-      --ui: 'Segoe UI', Arial, Helvetica, sans-serif;
-      --mono: 'Cascadia Code', Consolas, 'Lucida Console', 'Courier New', monospace;
-      --logo-font: 'Lucida Console', 'Cascadia Code', Consolas, 'Courier New', monospace;
-    }
-
-    body.light-theme {
-      --bg: #f3f4f6;
-      --panel: #ffffff;
-      --panel-deep: #eef2f7;
-      --text: #111827;
-      --text-soft: #1f2937;
-      --muted: #64748b;
-      --title: #0f172a;
-      --input-bg: #ffffff;
-      --accent: #8a8800;
-      --accent-soft: rgba(138, 136, 0, 0.12);
-      --blue-soft: rgba(2, 132, 199, 0.11);
-      --green-soft: rgba(22, 163, 74, 0.12);
-      --red-soft: rgba(220, 38, 38, 0.10);
-      --warning-soft: rgba(254, 226, 226, 0.92);
-      --border: rgba(100, 116, 139, 0.26);
-      --border-strong: rgba(71, 85, 105, 0.38);
-      --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: var(--ui);
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.10), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(221, 220, 0, 0.06), transparent 30%),
-        linear-gradient(135deg, #070d19, var(--bg));
-      color: var(--text);
-      padding: 14px;
-    }
-
-    body.light-theme {
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(221, 220, 0, 0.14), transparent 30%),
-        linear-gradient(135deg, #ffffff, var(--bg));
-    }
-
-    .app {
-      max-width: 1500px;
-      margin: 0 auto;
-      min-width: 0;
-    }
-
-    .top-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .topbar,
-    .notes-panel {
-      min-height: 78px;
-      padding: 12px 14px;
-      background: rgba(21, 31, 50, 0.92);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      min-width: 0;
-    }
-
-    body.light-theme .topbar,
-    body.light-theme .notes-panel {
-      background: rgba(255, 255, 255, 0.94);
-    }
-
-    .topbar {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .logo {
-      width: 50px;
-      height: 50px;
-      flex: 0 0 50px;
-      border-radius: 12px;
-      background:
-        linear-gradient(180deg, rgba(221, 220, 0, 0.16), transparent),
-        var(--panel-deep);
-      color: var(--accent);
-      border: 1px solid rgba(221, 220, 0, 0.48);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--logo-font);
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: -0.08em;
-      user-select: none;
-      box-shadow:
-        inset 0 0 16px rgba(221, 220, 0, 0.08),
-        0 0 20px rgba(221, 220, 0, 0.06);
-    }
-
-    .title {
-      min-width: 0;
-    }
-
-    .title h1 {
-      margin: 0;
-      font-size: 25px;
-      letter-spacing: -0.04em;
-      color: var(--title);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .title p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .right-tools {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-      min-width: 0;
-    }
-
-    .privacy-timer {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 9px;
-      border-radius: 11px;
-      background: var(--panel-deep);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-      font-family: var(--mono);
-      min-width: 0;
-    }
-
-    .privacy-timer strong {
-      min-width: 48px;
-      color: var(--accent);
-      font-size: 15px;
-      text-align: center;
-    }
-
-    .privacy-timer.danger {
-      background: var(--warning-soft);
-      border-color: rgba(239, 68, 68, 0.5);
-      color: #fecaca;
-      animation: timerBlink 1s infinite;
-    }
-
-    body.light-theme .privacy-timer.danger {
-      color: #991b1b;
-    }
-
-    .privacy-timer.danger strong {
-      color: #fecaca;
-    }
-
-    body.light-theme .privacy-timer.danger strong {
-      color: #991b1b;
-    }
-
-    @keyframes timerBlink {
-      0% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
-      50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.42); }
-      100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    .btn-timer,
-    .btn-theme {
-      width: 29px;
-      height: 29px;
-      padding: 0;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.06);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-size: 15px;
-      line-height: 1;
-    }
-
-    body.light-theme .btn-timer,
-    body.light-theme .btn-theme {
-      background: #ffffff;
-      color: #111827;
-      border-color: rgba(100, 116, 139, 0.30);
-    }
-
-    .notes-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: stretch;
-    }
-
-    .notes-panel textarea {
-      width: 100%;
-      min-width: 0;
-      min-height: 54px;
-      resize: vertical;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--panel-deep);
-      color: var(--text);
-      padding: 9px 10px;
-      font-size: 13px;
-      line-height: 1.35;
-      outline: none;
-    }
-
-    .notes-panel textarea::placeholder {
-      color: rgba(148, 163, 184, 0.68);
-    }
-
-    .notes-panel textarea:focus {
-      border-color: rgba(56, 189, 248, 0.36);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
-    }
-
-    .notes-actions {
-      display: flex;
-      align-items: stretch;
-    }
-
-    .ticker-row {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      align-items: stretch;
-      margin-bottom: 10px;
-      min-width: 0;
-    }
-
-    .status-ticker,
-    .clear-all-card,
-    .alpha-card {
-      min-height: 72px;
-      border-radius: 11px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      min-width: 0;
-      border: 1px solid var(--border);
-    }
-
-    .status-ticker {
-      grid-column: span 2;
-      background: rgba(7, 16, 31, 0.72);
-      border-color: rgba(148, 163, 184, 0.12);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      font-family: var(--mono);
-      font-size: 14px;
-      padding: 0 14px;
-    }
-
-    body.light-theme .status-ticker {
-      background: rgba(255, 255, 255, 0.88);
-      border-color: var(--border);
-    }
-
-    .status-ticker.success {
-      color: #bbf7d0;
-      background: var(--green-soft);
-      border-color: rgba(34, 197, 94, 0.34);
-    }
-
-    .status-ticker.warning {
-      color: #fde68a;
-      background: rgba(245, 158, 11, 0.13);
-      border-color: rgba(245, 158, 11, 0.30);
-    }
-
-    .status-ticker.error {
-      color: #fecaca;
-      background: var(--red-soft);
-      border-color: rgba(239, 68, 68, 0.30);
-    }
-
-    body.light-theme .status-ticker.success { color: #166534; }
-    body.light-theme .status-ticker.warning { color: #92400e; }
-    body.light-theme .status-ticker.error { color: #991b1b; }
-
-    .status-ticker strong {
-      color: var(--accent);
-    }
-
-    .clear-all-card {
-      grid-column: span 1;
-      background: rgba(21, 31, 50, 0.82);
-      display: flex;
-      align-items: stretch;
-      padding: 8px;
-    }
-
-    body.light-theme .clear-all-card,
-    body.light-theme .alpha-card,
-    body.light-theme .column {
-      background: rgba(255, 255, 255, 0.92);
-    }
-
-    .btn-clear-all {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .alpha-card {
-      grid-column: span 1;
-      width: 100%;
-      max-width: 100%;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      grid-template-areas:
-        'label label label'
-        'output copy hd';
-      align-items: center;
-      gap: 6px;
-      padding: 8px;
-      background: rgba(21, 31, 50, 0.82);
-    }
-
-    .alpha-label {
-      grid-area: label;
-      color: var(--text-soft);
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    .alpha-output { grid-area: output; }
-    .alpha-copy { grid-area: copy; }
-    .alpha-hd { grid-area: hd; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(210px, 1fr));
-      gap: 10px;
-      align-items: start;
-      min-width: 0;
-    }
-
-    .column {
-      background: rgba(21, 31, 50, 0.94);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 10px;
-      min-height: 100%;
-      min-width: 0;
-    }
-
-    .column:hover {
-      border-color: var(--border-strong);
-      background: rgba(27, 39, 64, 0.95);
-    }
-
-    body.light-theme .column:hover {
-      background: #ffffff;
-    }
-
-    .column-header {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 7px;
-    }
-
-    .column-title h2 {
-      margin: 0;
-      font-size: 17px;
-      color: var(--title);
-      letter-spacing: -0.03em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .btn-column-clear {
-      width: 32px;
-      height: 30px;
-      padding: 0;
-      border-radius: 9px;
-      background: var(--panel-deep);
-      color: var(--text-soft);
-      border: 1px solid var(--border);
-      font-size: 15px;
-    }
-
-    .number-input {
-      width: 100%;
-      min-width: 0;
-      padding: 8px 9px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-deep);
-      color: var(--text);
-      font-size: 19px;
-      font-family: var(--mono);
-      letter-spacing: 0.04em;
-      outline: none;
-      margin-bottom: 4px;
-    }
-
-    .number-input:focus {
-      border-color: rgba(221, 220, 0, 0.48);
-      box-shadow: 0 0 0 3px rgba(221, 220, 0, 0.08);
-    }
-
-    .number-input::placeholder {
-      color: rgba(148, 163, 184, 0.58);
-    }
-
-    .input-info {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 6px;
-      line-height: 1.15;
-    }
-
-    .command-area {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .command-row {
-      padding: 6px;
-      border-radius: 10px;
-      background: rgba(7, 16, 31, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.10);
-      min-width: 0;
-    }
-
-    body.light-theme .command-row {
-      background: #f8fafc;
-      border-color: rgba(100, 116, 139, 0.20);
-    }
-
-    .command-row.tone-green {
-      background: rgba(20, 83, 45, 0.26);
-      border-color: rgba(34, 197, 94, 0.22);
-    }
-
-    .command-row.tone-orange {
-      background: rgba(154, 52, 18, 0.30);
-      border-color: rgba(251, 146, 60, 0.34);
-    }
-
-    .command-row.tone-purple {
-      background: rgba(88, 28, 135, 0.30);
-      border-color: rgba(192, 132, 252, 0.34);
-    }
-
-    .command-row.tone-blue {
-      background: rgba(12, 74, 110, 0.32);
-      border-color: rgba(56, 189, 248, 0.34);
-    }
-
-    .command-row.tone-yellow {
-      background: rgba(113, 63, 18, 0.32);
-      border-color: rgba(253, 224, 71, 0.34);
-    }
-
-    body.light-theme .command-row.tone-green { background: rgba(22, 163, 74, 0.13); }
-    body.light-theme .command-row.tone-orange { background: rgba(249, 115, 22, 0.14); }
-    body.light-theme .command-row.tone-purple { background: rgba(126, 34, 206, 0.12); }
-    body.light-theme .command-row.tone-blue { background: rgba(2, 132, 199, 0.12); }
-    body.light-theme .command-row.tone-yellow { background: rgba(202, 138, 4, 0.15); }
-
-    .command-row.tone-green .command-label { color: #bbf7d0; }
-    .command-row.tone-orange .command-label { color: #fed7aa; }
-    .command-row.tone-purple .command-label { color: #e9d5ff; }
-    .command-row.tone-blue .command-label { color: #bae6fd; }
-    .command-row.tone-yellow .command-label { color: #fef08a; }
-
-    body.light-theme .command-row.tone-green .command-label { color: #166534; }
-    body.light-theme .command-row.tone-orange .command-label { color: #9a3412; }
-    body.light-theme .command-row.tone-purple .command-label { color: #6b21a8; }
-    body.light-theme .command-row.tone-blue .command-label { color: #075985; }
-    body.light-theme .command-row.tone-yellow .command-label { color: #854d0e; }
-
-    .command-row.flash-green { animation: commandFlashGreen 650ms ease-out 1; }
-    .command-row.flash-orange { animation: commandFlashOrange 750ms ease-out 1; }
-    .command-row.flash-purple { animation: commandFlashPurple 750ms ease-out 1; }
-    .command-row.flash-blue { animation: commandFlashBlue 750ms ease-out 1; }
-    .command-row.flash-yellow { animation: commandFlashYellow 750ms ease-out 1; }
-
-    @keyframes commandFlashGreen {
-      0% { background: rgba(20, 83, 45, 0.26); }
-      25% { background: rgba(20, 83, 45, 0.90); border-color: rgba(34, 197, 94, 0.78); }
-      100% { background: rgba(20, 83, 45, 0.26); }
-    }
-
-    @keyframes commandFlashOrange {
-      0% { background: rgba(154, 52, 18, 0.30); }
-      25% { background: rgba(234, 88, 12, 0.95); border-color: rgba(251, 146, 60, 0.92); }
-      100% { background: rgba(154, 52, 18, 0.30); }
-    }
-
-    @keyframes commandFlashPurple {
-      0% { background: rgba(88, 28, 135, 0.30); }
-      25% { background: rgba(126, 34, 206, 0.95); border-color: rgba(192, 132, 252, 0.92); }
-      100% { background: rgba(88, 28, 135, 0.30); }
-    }
-
-    @keyframes commandFlashBlue {
-      0% { background: rgba(12, 74, 110, 0.32); }
-      25% { background: rgba(2, 132, 199, 0.95); border-color: rgba(56, 189, 248, 0.92); }
-      100% { background: rgba(12, 74, 110, 0.32); }
-    }
-
-    @keyframes commandFlashYellow {
-      0% { background: rgba(113, 63, 18, 0.32); }
-      25% { background: rgba(202, 138, 4, 0.95); border-color: rgba(253, 224, 71, 0.92); }
-      100% { background: rgba(113, 63, 18, 0.32); }
-    }
-
-    .command-label {
-      margin-bottom: 3px;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-soft);
-      cursor: copy;
-      user-select: none;
-      line-height: 1.15;
-    }
-
-    .command-label:hover {
-      color: var(--accent);
-    }
-
-    .command-controls {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 5px;
-      min-width: 0;
-    }
-
-    .command-output,
-    .alpha-output {
-      width: 100%;
-      min-width: 0;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.13);
-      background: var(--input-bg);
-      color: var(--accent);
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
-      cursor: copy;
-    }
-
-    body.light-theme .command-output,
-    body.light-theme .alpha-output {
-      border-color: rgba(100, 116, 139, 0.24);
-    }
-
-    .command-output:focus,
-    .alpha-output:focus {
-      border-color: rgba(56, 189, 248, 0.38);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
-    }
-
-    .command-output::placeholder {
-      color: rgba(148, 163, 184, 0.32);
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 6px 8px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition:
-        transform 0.08s ease,
-        background 0.15s ease,
-        border-color 0.15s ease,
-        opacity 0.15s ease;
-      white-space: nowrap;
-      font-family: var(--ui);
-    }
-
-    button:hover { transform: translateY(-1px); }
-    button:active { transform: translateY(0); }
-
-    .btn-copy {
-      background: var(--blue-soft);
-      color: #e0f2fe;
-      border: 1px solid rgba(56, 189, 248, 0.30);
-    }
-
-    body.light-theme .btn-copy {
-      color: #075985;
-    }
-
-    .btn-copy:hover {
-      background: rgba(56, 189, 248, 0.22);
-    }
-
-    .btn-hd {
-      background: var(--accent-soft);
-      color: #fef9c3;
-      border: 1px solid rgba(221, 220, 0, 0.28);
-    }
-
-    body.light-theme .btn-hd {
-      color: #713f12;
-    }
-
-    .btn-hd:hover {
-      background: rgba(221, 220, 0, 0.20);
-    }
-
-    .btn-danger {
-      background: var(--red-soft);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.24);
-    }
-
-    body.light-theme .btn-danger {
-      color: #991b1b;
-    }
-
-    .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.20);
-    }
-
-    .footer {
-      margin-top: 10px;
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      border-radius: 14px;
-      background: rgba(7, 16, 31, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.10);
-    }
-
-    body.light-theme .footer {
-      background: rgba(255, 255, 255, 0.76);
-      border-color: var(--border);
-    }
-
-    .footer strong {
-      color: var(--text-soft);
-      font-weight: 700;
-    }
-
-    @media (max-width: 1100px) {
-      .top-layout,
-      .ticker-row {
-        grid-template-columns: 1fr;
-      }
-
-      .status-ticker,
-      .clear-all-card,
-      .alpha-card {
-        grid-column: auto;
-      }
-    }
-
-    @media (max-width: 980px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(210px, 1fr));
-      }
-
-      .topbar {
-        grid-template-columns: 1fr;
-      }
-
-      .right-tools {
-        justify-content: flex-start;
-      }
-    }
-
-    @media (max-width: 580px) {
-      body { padding: 9px; }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .brand { min-width: 0; }
-      .title h1 { font-size: 22px; }
-      .command-controls { grid-template-columns: minmax(0, 1fr) auto auto; }
-
-      .alpha-card {
-        grid-template-columns: minmax(0, 1fr) auto auto;
-        grid-template-areas:
-          'label label label'
-          'output copy hd';
-      }
-
-      .privacy-timer {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .notes-panel {
-        grid-template-columns: 1fr;
-      }
-
-      .notes-actions {
-        justify-content: stretch;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>DBD-Assistent</title>
+<style>
+:root{--bg:#0b1120;--panel:#151f32;--deep:#07101f;--input:#020617;--text:#e5e7eb;--soft:#cbd5e1;--muted:#94a3b8;--title:#f8fafc;--accent:#dddc00;--border:rgba(148,163,184,.18);--border2:rgba(148,163,184,.3);--shadow:0 16px 40px rgba(0,0,0,.3);--red:rgba(239,68,68,.13);--blue:rgba(56,189,248,.14);--ui:"Segoe UI",Arial,sans-serif;--mono:"Cascadia Code",Consolas,"Courier New",monospace}
+body.light{--bg:#f3f4f6;--panel:#fff;--deep:#eef2f7;--input:#fff;--text:#111827;--soft:#1f2937;--muted:#64748b;--title:#0f172a;--accent:#777600;--border:rgba(100,116,139,.26);--border2:rgba(71,85,105,.38);--shadow:0 12px 28px rgba(15,23,42,.1);--red:rgba(220,38,38,.1);--blue:rgba(2,132,199,.11)}
+*{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;min-height:100vh;padding:14px;font-family:var(--ui);color:var(--text);background:radial-gradient(circle at top left,rgba(56,189,248,.1),transparent 34%),linear-gradient(135deg,#070d19,var(--bg))}body.light{background:radial-gradient(circle at top left,rgba(56,189,248,.14),transparent 34%),linear-gradient(135deg,#fff,var(--bg))}
+.app{max-width:1500px;margin:auto}.top{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.box,.column,.editor{background:rgba(21,31,50,.94);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}body.light .box,body.light .column,body.light .editor{background:rgba(255,255,255,.95)}
+.header{min-height:78px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px}.brand{display:flex;gap:12px;align-items:center;min-width:0}.logo{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--deep);border:1px solid rgba(221,220,0,.45);color:var(--accent);font:900 18px var(--mono);letter-spacing:-.08em}.title{min-width:0}.title h1{margin:0;color:var(--title);font-size:25px;letter-spacing:-.04em}.profileline{display:flex;align-items:center;gap:5px;margin-top:4px}.profileline select{max-width:250px;min-width:0;height:28px;padding:3px 7px;border-radius:8px;border:1px solid var(--border);background:var(--deep);color:var(--soft);font-size:12px;font-weight:700}
+.tools{display:flex;justify-content:flex-end;align-items:center;gap:7px;flex-wrap:wrap}.timer{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--border);border-radius:11px;background:var(--deep);color:var(--muted);font:13px var(--mono)}.timer strong{min-width:48px;text-align:center;color:var(--accent);font-size:15px}.timer.danger{animation:blink 1s infinite;background:rgba(127,29,29,.42);border-color:rgba(239,68,68,.5);color:#fecaca}.timer.danger strong{color:#fecaca}body.light .timer.danger,body.light .timer.danger strong{color:#991b1b;background:#fee2e2}@keyframes blink{50%{box-shadow:0 0 18px rgba(239,68,68,.4)}}
+.ibtn{width:29px;height:29px;min-width:29px;padding:0;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);font-size:14px}.notes{min-height:78px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:8px}.notes textarea{width:100%;min-height:54px;resize:vertical;border:1px solid var(--border);border-radius:10px;background:var(--deep);color:var(--text);padding:9px 10px;outline:none}
+button{font-family:var(--ui);font-weight:800;font-size:12px;cursor:pointer;border:none;transition:.12s;white-space:nowrap}button:hover{transform:translateY(-1px)}.danger{background:var(--red);color:#fecaca;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:6px 8px}body.light .danger{color:#991b1b}.copy{background:var(--blue);color:#e0f2fe;border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:6px 8px}body.light .copy{color:#075985}.hd{background:rgba(221,220,0,.14);color:#fef9c3;border:1px solid rgba(221,220,0,.28);border-radius:8px;padding:6px 8px}body.light .hd{color:#713f12}
+.quickrow{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:10px;margin-bottom:6px}.quick,.clearcard{min-height:72px;padding:8px;border:1px solid var(--border);border-radius:11px;background:rgba(21,31,50,.84);box-shadow:var(--shadow)}body.light .quick,body.light .clearcard{background:#fff}.clearcard{display:flex}.clearcard button{width:100%}.quick{display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"label label label" "out copy hd";gap:6px;align-items:center}.qlabel{grid-area:label;color:var(--soft);font-size:12px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:copy}.qout{grid-area:out}.qcopy{grid-area:copy}.qhd{grid-area:hd}
+.status{min-height:28px;margin-bottom:8px;padding:5px 10px;border-radius:9px;background:rgba(7,16,31,.68);border:1px solid var(--border);color:var(--muted);font:11px var(--mono);display:flex;align-items:center}.status.success{color:#bbf7d0;border-color:rgba(34,197,94,.35)}.status.warning{color:#fde68a;border-color:rgba(245,158,11,.3)}.status.error{color:#fecaca;border-color:rgba(239,68,68,.3)}body.light .status.success{color:#166534}body.light .status.warning{color:#92400e}body.light .status.error{color:#991b1b}.status strong{color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;align-items:start}.column{padding:10px}.chead{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-bottom:7px}.chead h2{margin:0;color:var(--title);font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cclear{width:32px;height:30px;padding:0;border-radius:9px;background:var(--deep);color:var(--soft);border:1px solid var(--border)}.number{width:100%;padding:8px 9px;border-radius:10px;border:1px solid var(--border);background:var(--deep);color:var(--text);font:19px var(--mono);outline:none;margin-bottom:4px}.info{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}.commands{display:flex;flex-direction:column;gap:5px}.cmd{padding:6px;border-radius:10px;background:rgba(7,16,31,.45);border:1px solid rgba(148,163,184,.1)}body.light .cmd{background:#f8fafc;border-color:rgba(100,116,139,.2)}.clabel{margin-bottom:3px;font-size:11.5px;font-weight:700;color:var(--soft);cursor:copy}.controls{display:grid;grid-template-columns:1fr auto auto;gap:5px}.cout,.qout{width:100%;min-width:0;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--accent);font:13px var(--mono);outline:none;cursor:copy}
+.editor{display:none;padding:12px;margin-bottom:10px}body.editing .editor{display:block}body.editing .grid,body.editing .quickrow,body.editing .status{display:none}body.editing .profileline{opacity:.58}body.editing .profileline select,body.editing .profileline button{pointer-events:none}.etool{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;margin-bottom:10px}.einput{width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--deep);color:var(--text);outline:none}.esettings{display:grid;grid-template-columns:minmax(150px,260px) auto;gap:8px;align-items:center;color:var(--soft);font-size:12px}.esection{border-top:1px solid var(--border);padding-top:10px;margin-top:10px}.esectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--title);font-weight:800}.ecols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px}.ecard{border:1px solid var(--border);border-radius:12px;padding:8px;background:rgba(7,16,31,.28)}body.light .ecard{background:#f8fafc}.echead{display:grid;grid-template-columns:1fr auto auto auto;gap:5px;margin-bottom:7px}.erow{display:grid;grid-template-columns:minmax(100px,1fr) minmax(90px,.8fr) auto auto auto auto;gap:5px;align-items:center;padding:5px 0;border-top:1px solid rgba(148,163,184,.1)}.erow:first-child{border-top:none}.colors{display:flex;align-items:center;gap:3px;flex-wrap:wrap}.swatch{width:17px;height:17px;min-width:17px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.3)}.cpick{width:28px;height:28px;padding:2px;border:1px solid var(--border);border-radius:7px;background:var(--deep)}.small{width:28px;height:28px;min-width:28px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--deep);color:var(--text)}.add{width:100%;margin-top:6px;padding:6px;border:1px dashed var(--border2);border-radius:8px;background:transparent;color:var(--soft)}
+.footer{margin-top:10px;padding:10px;color:var(--muted);font-size:12px;text-align:center;border-radius:14px;background:rgba(7,16,31,.45);border:1px solid var(--border)}body.light .footer{background:#fff}.footer strong{color:var(--soft)}.hidden{display:none!important}
+@media(max-width:1100px){.top{grid-template-columns:1fr}.quickrow{grid-template-columns:repeat(2,minmax(210px,1fr))}}@media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(210px,1fr))}.header{grid-template-columns:1fr}.tools{justify-content:flex-start}.erow{grid-template-columns:1fr 1fr auto auto}.colors{grid-column:1/3}}@media(max-width:580px){body{padding:9px}.grid,.quickrow{grid-template-columns:1fr}.notes{grid-template-columns:1fr}.etool{grid-template-columns:1fr auto auto}.etool .pname{grid-column:1/-1}.privacy{width:100%}}
+</style>
 </head>
-
 <body>
-  <div class='app'>
-
-    <div class='top-layout'>
-      <header class='topbar'>
-        <div class='brand'>
-          <div class='logo'>DBD</div>
-
-          <div class='title'>
-            <h1>DBD-Assistent</h1>
-            <p>Effizientes Kopieren von Befehlen</p>
-          </div>
-        </div>
-
-        <div class='right-tools'>
-          <div id='privacyTimerBox' class='privacy-timer'>
-            <span>Auto-Clear</span>
-            <strong id='privacyTimer'>10:00</strong>
-
-            <button
-              class='btn-timer'
-              onclick='resetPrivacyTimer()'
-              title='Timer wieder auf 10 Minuten setzen'
-            >
-              🔄
-            </button>
-
-            <button
-              id='themeToggle'
-              class='btn-theme'
-              onclick='toggleTheme()'
-              title='Helle Darstellung einschalten'
-            >
-              ☀️
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section class='notes-panel'>
-        <textarea
-          id='notes'
-          autocomplete='off'
-          autocorrect='off'
-          autocapitalize='off'
-          spellcheck='false'
-          placeholder='Temporäre Notizen. Dieses Feld wird nicht automatisch gelöscht, ist aber nicht als dauerhafte Ablage gedacht.'
-        ></textarea>
-
-        <div class='notes-actions'>
-          <button class='btn-danger' onclick='clearNotes()' title='Notizen löschen'>
-            🧹 Clear
-          </button>
-        </div>
-      </section>
-    </div>
-
-    <div class='ticker-row'>
-      <section id='statusTicker' class='status-ticker'>
-        <span id='statusText'>
-          <strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren
-        </span>
-      </section>
-
-      <section class='clear-all-card'>
-        <button class='btn-danger btn-clear-all' onclick='manualClearNumbers()' title='Alle Nummern löschen. Notizen bleiben erhalten.'>
-          ♻️ Alle Nummern löschen
-        </button>
-      </section>
-
-      <section class='alpha-card'>
-        <div class='alpha-label'>Alpha-Abfrage</div>
-
-        <input
-          id='alpha-command'
-          class='alpha-output'
-          value='70anz090'
-          readonly
-          autocomplete='off'
-          autocorrect='off'
-          autocapitalize='off'
-          spellcheck='false'
-          ondblclick='copyStaticCommand(&apos;alpha-command&apos;, false)'
-          title='Doppelklick: Befehl kopieren'
-        />
-
-        <button
-          class='btn-copy alpha-copy'
-          onclick='copyStaticCommand(&apos;alpha-command&apos;, false)'
-          title='Befehl kopieren'
-        >
-          Copy
-        </button>
-
-        <button
-          class='btn-hd alpha-hd'
-          onclick='copyStaticCommand(&apos;alpha-command&apos;, true)'
-          title='Befehl mit hd am Anfang kopieren'
-        >
-          HD
-        </button>
-      </section>
-    </div>
-
-    <main id='grid' class='grid'></main>
-
-    <footer class='footer'>
-      <strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id='currentYear'></span> · Version 0.3
-    </footer>
-
+<div class="app">
+  <div class="top">
+    <header class="box header">
+      <div class="brand"><div class="logo">DBD</div><div class="title"><h1>DBD-Assistent</h1><div class="profileline">
+        <select id="profileSelect" title="Profil auswählen"></select>
+        <button class="ibtn" onclick="editProfile()" title="Profil bearbeiten">✏️</button>
+        <button class="ibtn" onclick="newProfile()" title="Neues Profil">➕</button>
+        <button class="ibtn" onclick="shareProfile()" title="Profil teilen / exportieren">📤</button>
+        <button class="ibtn" onclick="profileImport.click()" title="Profil importieren">📥</button>
+      </div></div></div>
+      <div class="tools">
+        <button class="ibtn" onclick="feedback()" title="Feedback senden">💬</button>
+        <div id="timerBox" class="timer"><span>Auto-Clear</span><strong id="timer">10:00</strong><button class="ibtn" onclick="resetTimer()" title="Timer zurücksetzen">🔄</button></div>
+        <button id="themeBtn" class="ibtn" onclick="toggleTheme()" title="Helle Darstellung einschalten">☀️</button>
+      </div>
+    </header>
+    <section class="box notes"><textarea id="notes" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Temporäre Notizen. Nicht als dauerhafte Ablage gedacht."></textarea><button class="danger" onclick="clearNotes()" title="Notizen löschen">🧹 Clear</button></section>
   </div>
 
-  <script>
-    /*
-      RU: Основные настройки программы.
-      DE: Grundeinstellungen der Anwendung.
-    */
-    const PRIVACY_TIMER_START_SECONDS = 10 * 60;
-    const STATUS_RESET_DELAY = 3000;
-
-    const DEFAULT_STATUS_HTML =
-      '<strong>Status:</strong> Bereit. · <strong>Info:</strong> Doppelklick auf Befehl oder Bezeichnung = kopieren';
-
-    const columns = [
-      {
-        id: 'depot',
-        title: 'Depotnummer',
-        placeholder: '10 Zeichen',
-        commands: [
-          { label: 'Grundbefehl', prefix: '90anz091', tone: 'green' },
-
-          { label: 'Sperren anzeigen', prefix: '11anz213' },
-          { label: 'Sperre setzen', prefix: '11neu213' },
-          { label: 'Sperre löschen', prefix: '11loe213', tone: 'orange' },
-          { label: 'Sperre ändern', prefix: '11aen213' },
-
-          { label: 'Rollen (Person) anzeigen', prefix: '10anz113', tone: 'purple' },
-          { label: 'Eheverbund/Einzel PID anzeigen', prefix: '70anz030' },
-
-          { label: 'Hinweistexte anzeigen', prefix: '10anz013' },
-          { label: 'Hinweistexte ändern/löschen', prefix: '10aen013', tone: 'blue' },
-          { label: 'Hinweistexte setzen', prefix: '10neu013' },
-
-          { label: 'FSA Zukunft anzeigen', prefix: '70anz040' },
-          { label: 'FSA Vorjahr anzeigen', prefix: '70anz042' },
-
-          { label: 'Bankverbindung', prefix: '10anz012' }
-        ]
-      },
-      {
-        id: 'pid1',
-        title: 'PID 1',
-        placeholder: '10 Zeichen',
-        commands: [
-          { label: 'Personendaten anzeigen', prefix: '70anz010' },
-          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
-          { label: 'Kontaktdaten', prefix: '70anz060' },
-          { label: 'AGB ETF', prefix: '70anz080' }
-        ]
-      },
-      {
-        id: 'pid2',
-        title: 'PID 2',
-        placeholder: '10 Zeichen',
-        commands: [
-          { label: 'Personendaten anzeigen', prefix: '70anz010' },
-          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
-          { label: 'Kontaktdaten', prefix: '70anz060' },
-          { label: 'AGB ETF', prefix: '70anz080' }
-        ]
-      },
-      {
-        id: 'pid3',
-        title: 'PID 3',
-        placeholder: '10 Zeichen',
-        commands: [
-          { label: 'Personendaten anzeigen', prefix: '70anz010' },
-          { label: 'Personendaten ändern', prefix: '70k  010', tone: 'yellow' },
-          { label: 'Kontaktdaten', prefix: '70anz060' },
-          { label: 'AGB ETF', prefix: '70anz080' }
-        ]
-      }
-    ];
-
-    const grid = document.getElementById('grid');
-    const statusTicker = document.getElementById('statusTicker');
-    const statusText = document.getElementById('statusText');
-    const themeToggle = document.getElementById('themeToggle');
-
-    let privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
-    let privacyTimerInterval = null;
-    let statusResetTimer = null;
-    let isLightTheme = false;
-
-    function createInterface() {
-      columns.forEach(column => {
-        const columnElement = document.createElement('section');
-        columnElement.className = 'column';
-        columnElement.dataset.columnId = column.id;
-
-        columnElement.innerHTML = `
-          <div class='column-header'>
-            <div class='column-title'>
-              <h2>${column.title}</h2>
-            </div>
-
-            <button
-              id='${column.id}-clear'
-              class='btn-column-clear'
-              onclick='clearColumn(&apos;${column.id}&apos;)'
-              title='Spalte leeren'
-            >
-              ♻️
-            </button>
-          </div>
-
-          <input
-            id='${column.id}-input'
-            class='number-input'
-            maxlength='10'
-            placeholder='${column.placeholder}'
-            autocomplete='off'
-            autocorrect='off'
-            autocapitalize='off'
-            spellcheck='false'
-          />
-
-          <div class='input-info'>
-            <span>Max. 10 Zeichen</span>
-            <span id='${column.id}-counter'>0 / 10</span>
-          </div>
-
-          <div class='command-area'>
-            ${column.commands.map((command, index) => {
-              const toneClass = command.tone ? `tone-${command.tone}` : '';
-              const flashClass = command.tone ? `flash-${command.tone}` : '';
-
-              return `
-                <div
-                  class='command-row ${toneClass}'
-                  data-flash-class='${flashClass}'
-                >
-                  <div
-                    class='command-label'
-                    ondblclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
-                    title='Doppelklick: Befehl kopieren'
-                  >
-                    ${command.label}
-                  </div>
-
-                  <div class='command-controls'>
-                    <input
-                      id='${column.id}-command-${index}'
-                      class='command-output'
-                      value=''
-                      placeholder='${command.prefix}...'
-                      readonly
-                      autocomplete='off'
-                      autocorrect='off'
-                      autocapitalize='off'
-                      spellcheck='false'
-                      ondblclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
-                      title='Doppelklick: Befehl kopieren'
-                    />
-
-                    <button
-                      class='btn-copy'
-                      onclick='copyCommand(&apos;${column.id}-command-${index}&apos;, false)'
-                      title='Befehl kopieren'
-                    >
-                      Copy
-                    </button>
-
-                    <button
-                      class='btn-hd'
-                      onclick='copyCommand(&apos;${column.id}-command-${index}&apos;, true)'
-                      title='Befehl mit hd am Anfang kopieren'
-                    >
-                      HD
-                    </button>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `;
-
-        grid.appendChild(columnElement);
-
-        const input = document.getElementById(`${column.id}-input`);
-
-        input.addEventListener('input', () => {
-          input.value = cleanValue(input.value);
-          updateColumn(column);
-          silentlyResetPrivacyTimer();
-        });
-
-        input.addEventListener('focus', () => {
-          input.select();
-        });
-
-        input.addEventListener('click', () => {
-          input.select();
-        });
-      });
-    }
-
-    function getColumn(columnId) {
-      return columns.find(column => column.id === columnId);
-    }
-
-    function cleanValue(value) {
-      /*
-        RU: Оставляем первые 10 символов и убираем пробелы по краям.
-        DE: Es bleiben die ersten 10 Zeichen, äußere Leerzeichen werden entfernt.
-      */
-      return String(value || '').trim().slice(0, 10);
-    }
-
-    function updateColumn(column) {
-      const input = document.getElementById(`${column.id}-input`);
-      const counter = document.getElementById(`${column.id}-counter`);
-      const value = input.value.trim();
-
-      counter.textContent = `${value.length} / 10`;
-
-      column.commands.forEach((command, index) => {
-        const output = document.getElementById(`${column.id}-command-${index}`);
-        output.value = value ? `${command.prefix}${value}` : '';
-      });
-    }
-
-    function clearColumn(columnId) {
-      const column = getColumn(columnId);
-      const input = document.getElementById(`${columnId}-input`);
-
-      if (!column || !input) {
-        return;
-      }
-
-      input.value = '';
-      updateColumn(column);
-      silentlyResetPrivacyTimer();
-      setStatus(`${column.title} geleert.`, 'warning');
-    }
-
-    async function copyText(text) {
-      if (!text) {
-        setStatus('Nichts zu kopieren.', 'warning');
-        return false;
-      }
-
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(text);
-        } else {
-          fallbackCopy(text);
-        }
-
-        setStatus(`Kopiert: ${text}`, 'success');
-        return true;
-      } catch (error) {
-        try {
-          fallbackCopy(text);
-          setStatus(`Kopiert: ${text}`, 'success');
-          return true;
-        } catch (fallbackError) {
-          setStatus('Kopieren fehlgeschlagen.', 'error');
-          return false;
-        }
-      }
-    }
-
-    function fallbackCopy(text) {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed';
-      textarea.style.left = '-9999px';
-      textarea.style.top = '-9999px';
-
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.select();
-
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-    }
-
-    async function copyCommand(elementId, withHD) {
-      const field = document.getElementById(elementId);
-      const baseCommand = field.value;
-
-      if (!baseCommand) {
-        setStatus('Erst Nummer einfügen.', 'warning');
-        return;
-      }
-
-      const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
-      const copied = await copyText(finalCommand);
-
-      if (copied) {
-        flashCommandRow(field);
-        silentlyResetPrivacyTimer();
-      }
-    }
-
-    async function copyStaticCommand(elementId, withHD) {
-      const field = document.getElementById(elementId);
-      const baseCommand = field.value;
-      const finalCommand = withHD ? `hd${baseCommand}` : baseCommand;
-
-      await copyText(finalCommand);
-      silentlyResetPrivacyTimer();
-    }
-
-    function flashCommandRow(field) {
-      const row = field.closest('.command-row');
-
-      if (!row) {
-        return;
-      }
-
-      const flashClass = row.dataset.flashClass;
-
-      if (!flashClass) {
-        return;
-      }
-
-      row.classList.remove(flashClass);
-
-      /*
-        RU: Reflow нужен, чтобы повторная анимация запускалась каждый раз.
-        DE: Reflow sorgt dafür, dass die Animation jedes Mal neu startet.
-      */
-      void row.offsetWidth;
-
-      row.classList.add(flashClass);
-
-      setTimeout(() => {
-        row.classList.remove(flashClass);
-      }, 800);
-    }
-
-    function clearNotes() {
-      document.getElementById('notes').value = '';
-      setStatus('Notizen gelöscht.', 'warning');
-    }
-
-    function setStatus(message, type) {
-      clearTimeout(statusResetTimer);
-
-      statusTicker.className = 'status-ticker';
-
-      if (type) {
-        statusTicker.classList.add(type);
-      }
-
-      statusText.textContent = `Status: ${message}`;
-
-      statusResetTimer = setTimeout(() => {
-        statusTicker.className = 'status-ticker';
-        statusText.innerHTML = DEFAULT_STATUS_HTML;
-      }, STATUS_RESET_DELAY);
-    }
-
-    function toggleTheme() {
-      /*
-        RU: Тема меняется только в текущей вкладке и не сохраняется в браузере.
-        DE: Die Darstellung wird nur im aktuellen Tab geändert und nicht im Browser gespeichert.
-      */
-      isLightTheme = !isLightTheme;
-      document.body.classList.toggle('light-theme', isLightTheme);
-
-      themeToggle.textContent = isLightTheme ? '🌙' : '☀️';
-      themeToggle.title = isLightTheme
-        ? 'Dunkle Darstellung einschalten'
-        : 'Helle Darstellung einschalten';
-
-      setStatus(isLightTheme ? 'Helle Darstellung aktiviert.' : 'Dunkle Darstellung aktiviert.', 'success');
-    }
-
-    function formatMinutesSeconds(seconds) {
-      const safeSeconds = Math.max(0, seconds);
-      const minutes = Math.floor(safeSeconds / 60);
-      const restSeconds = safeSeconds % 60;
-
-      return `${String(minutes).padStart(2, '0')}:${String(restSeconds).padStart(2, '0')}`;
-    }
-
-    function getPrivacySecondsLeft() {
-      /*
-        RU: Таймер считается по реальному времени, а не по количеству тиков.
-        DE: Der Timer basiert auf echter Zeit, nicht auf der Anzahl der Intervalle.
-      */
-      return Math.max(0, Math.ceil((privacyDeadlineAt - Date.now()) / 1000));
-    }
-
-    function updatePrivacyTimerView() {
-      const timer = document.getElementById('privacyTimer');
-      const timerBox = document.getElementById('privacyTimerBox');
-      const secondsLeft = getPrivacySecondsLeft();
-
-      timer.textContent = formatMinutesSeconds(secondsLeft);
-
-      if (secondsLeft <= 60) {
-        timerBox.classList.add('danger');
-      } else {
-        timerBox.classList.remove('danger');
-      }
-    }
-
-    function handlePrivacyTimerTick() {
-      const secondsLeft = getPrivacySecondsLeft();
-
-      if (secondsLeft <= 0) {
-        clearSensitiveData();
-        setStatus('Nummern automatisch gelöscht.', 'warning');
-        return;
-      }
-
-      updatePrivacyTimerView();
-    }
-
-    function startPrivacyTimer() {
-      clearInterval(privacyTimerInterval);
-      handlePrivacyTimerTick();
-      privacyTimerInterval = setInterval(handlePrivacyTimerTick, 1000);
-    }
-
-    function resetPrivacyTimer() {
-      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
-      updatePrivacyTimerView();
-      setStatus('Timer zurückgesetzt.', 'success');
-    }
-
-    function silentlyResetPrivacyTimer() {
-      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
-      updatePrivacyTimerView();
-    }
-
-    function clearSensitiveData() {
-      /*
-        RU: Заметки не очищаются. Очищаются только номера и команды.
-        DE: Notizen bleiben erhalten. Nur Nummern und Befehle werden geleert.
-      */
-      document.querySelectorAll('.number-input').forEach(input => {
-        input.value = '';
-      });
-
-      columns.forEach(column => {
-        updateColumn(column);
-      });
-
-      privacyDeadlineAt = Date.now() + PRIVACY_TIMER_START_SECONDS * 1000;
-      updatePrivacyTimerView();
-    }
-
-    function manualClearNumbers() {
-      clearSensitiveData();
-      setStatus('Nummern gelöscht. Notizen bleiben erhalten.', 'warning');
-    }
-
-    function setCurrentYear() {
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
-    }
-
-    /*
-      RU: При возвращении во вкладку таймер сразу проверяет реальное прошедшее время.
-      DE: Beim Zurückkehren in den Tab prüft der Timer sofort die tatsächlich vergangene Zeit.
-    */
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        handlePrivacyTimerTick();
-      }
-    });
-
-    window.addEventListener('focus', handlePrivacyTimerTick);
-
-    createInterface();
-    startPrivacyTimer();
-    setCurrentYear();
-  </script>
+  <input id="profileImport" class="hidden" type="file" accept=".json,application/json">
+
+  <section class="editor" id="editor">
+    <div class="etool">
+      <input id="profileName" class="einput pname" maxlength="60" placeholder="Profilname">
+      <button class="ibtn" onclick="cancelEdit()" title="Änderungen verwerfen">✖️</button>
+      <button class="ibtn" onclick="saveEdit()" title="Profil speichern">💾</button>
+      <button class="ibtn" onclick="deleteProfile()" title="Eigenes Profil löschen">🗑️</button>
+    </div>
+    <div class="esettings"><label for="autoClear">⏱ Auto-Clear (Min.)</label><input id="autoClear" class="einput" type="number" min="1" max="60" step="1"></div>
+    <div class="esection"><div class="esectionhead"><span>⚡ Schnellbefehle</span><button class="ibtn" onclick="addQuick()" title="Schnellbefehl hinzufügen">➕</button></div><div id="quickEditor"></div></div>
+    <div class="esection"><div class="esectionhead"><span>▥ Spalten</span><button class="ibtn" onclick="addColumn()" title="Spalte hinzufügen">➕</button></div><div id="columnsEditor" class="ecols"></div></div>
+  </section>
+
+  <div id="quickRow" class="quickrow"></div>
+  <section id="status" class="status"><span id="statusText"><strong>Status:</strong> Bereit. · Doppelklick auf Befehl oder Bezeichnung = kopieren</span></section>
+  <main id="grid" class="grid"></main>
+  <footer class="footer"><strong>Ilia Bolotskikh</strong> · Keine Rechte geschützt · <span id="year"></span> · Version 0.4.0</footer>
+</div>
+
+<script>
+const VERSION="0.4.0",FORMAT="DBD-Assistent-Profile",FORMAT_VERSION=1,KEY_PROFILES="dbdAssistant.userProfiles.v1",KEY_ACTIVE="dbdAssistant.activeProfile.v1",KEY_THEME="dbdAssistant.theme.v1",FEEDBACK="ilia.bolotskikh@dwpservice.de",STATUS_DELAY=3000;
+const PALETTE=["#22c55e","#fb923c","#fde047","#38bdf8","#c084fc","#ef4444","#f472b6","#22d3ee"];
+const pidCommands=id=>[
+{id:id+"-1",label:"Personendaten anzeigen",prefix:"70anz010",color:null},
+{id:id+"-2",label:"Personendaten ändern",prefix:"70k  010",color:"#fde047"},
+{id:id+"-3",label:"Kontaktdaten",prefix:"70anz060",color:null},
+{id:id+"-4",label:"AGB ETF",prefix:"70anz080",color:null}
+];
+const BUILTINS=[{id:"builtin-team-c-standard",name:"Team C – Standard",builtIn:true,autoClearMinutes:10,quickCommands:[{id:"quick-alpha",label:"Alpha-Abfrage",command:"70anz090",color:null}],columns:[
+{id:"depot",title:"Depotnummer",placeholder:"10 Zeichen",commands:[
+{id:"d1",label:"Grundbefehl",prefix:"90anz091",color:"#22c55e"},
+{id:"d2",label:"Sperren anzeigen",prefix:"11anz213",color:null},
+{id:"d3",label:"Sperre setzen",prefix:"11neu213",color:null},
+{id:"d4",label:"Sperre löschen",prefix:"11loe213",color:"#fb923c"},
+{id:"d5",label:"Sperre ändern",prefix:"11aen213",color:null},
+{id:"d6",label:"Rollen (Person) anzeigen",prefix:"10anz113",color:"#c084fc"},
+{id:"d7",label:"Eheverbund/Einzel PID anzeigen",prefix:"70anz030",color:null},
+{id:"d8",label:"Hinweistexte anzeigen",prefix:"10anz013",color:null},
+{id:"d9",label:"Hinweistexte ändern/löschen",prefix:"10aen013",color:"#38bdf8"},
+{id:"d10",label:"Hinweistexte setzen",prefix:"10neu013",color:null},
+{id:"d11",label:"FSA Zukunft anzeigen",prefix:"70anz040",color:null},
+{id:"d12",label:"FSA Vorjahr anzeigen",prefix:"70anz042",color:null},
+{id:"d13",label:"Bankverbindung",prefix:"10anz012",color:null}]},
+{id:"pid1",title:"PID 1",placeholder:"10 Zeichen",commands:pidCommands("p1")},
+{id:"pid2",title:"PID 2",placeholder:"10 Zeichen",commands:pidCommands("p2")},
+{id:"pid3",title:"PID 3",placeholder:"10 Zeichen",commands:pidCommands("p3")}
+]}];
+
+const $=id=>document.getElementById(id),grid=$("grid"),quickRow=$("quickRow"),status=$("status"),statusText=$("statusText"),profileSelect=$("profileSelect"),profileImport=$("profileImport"),themeBtn=$("themeBtn"),profileName=$("profileName"),autoClear=$("autoClear"),quickEditor=$("quickEditor"),columnsEditor=$("columnsEditor");
+let userProfiles=loadProfiles(),activeId=loadActive(),editing=null,editingBuiltin=false,deadline=Date.now(),timerHandle=null,statusHandle=null,isLight=storageGet(KEY_THEME)==="light";
+
+function storageGet(k){try{return localStorage.getItem(k)}catch{return null}}
+function storageSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}}
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function id(p){return p+"-"+Date.now()+"-"+Math.floor(Math.random()*1e5)}
+function allProfiles(){return [...BUILTINS,...userProfiles]}
+function active(){return allProfiles().find(p=>p.id===activeId)||BUILTINS[0]}
+function clean(v,n){return String(v??"").replace(/[\u0000-\u001f\u007f]/g,"").slice(0,n).trim()}
+function color(v){if(v==null||v===""||v==="none")return null;v=String(v).trim();return /^#[0-9a-fA-F]{6}$/.test(v)?v.toLowerCase():null}
+function normCmd(c){if(!c||typeof c!=="object")return null;let label=clean(c.label,60),prefix=clean(c.prefix,120);if(!label||!prefix)return null;return{id:clean(c.id,80)||id("cmd"),label,prefix,color:color(c.color)}}
+function normalize(p,imported=false){
+ if(!p||typeof p!=="object")return null;let name=clean(p.name,60);if(!name)return null;
+ let cols=(Array.isArray(p.columns)?p.columns:[]).slice(0,12).map((c,i)=>c&&typeof c==="object"?{id:clean(c.id,80)||id("col"),title:clean(c.title,50)||`Spalte ${i+1}`,placeholder:clean(c.placeholder,30)||"10 Zeichen",commands:(Array.isArray(c.commands)?c.commands:[]).slice(0,100).map(normCmd).filter(Boolean)}:null).filter(Boolean);
+ let quick=(Array.isArray(p.quickCommands)?p.quickCommands:[]).slice(0,30).map(q=>{if(!q||typeof q!=="object")return null;let label=clean(q.label,60),command=clean(q.command,120);return label&&command?{id:clean(q.id,80)||id("quick"),label,command,color:color(q.color)}:null}).filter(Boolean);
+ let t=Number(p.autoClearMinutes);return{id:imported?id("user"):(clean(p.id,80)||id("user")),name,builtIn:false,autoClearMinutes:Number.isFinite(t)?Math.min(60,Math.max(1,Math.round(t))):10,quickCommands:quick,columns:cols};
+}
+function loadProfiles(){try{let a=JSON.parse(storageGet(KEY_PROFILES)||"[]");return Array.isArray(a)?a.map(p=>normalize(p,false)).filter(Boolean):[]}catch{return[]}}
+function saveProfiles(){storageSet(KEY_PROFILES,JSON.stringify(userProfiles))}
+function loadActive(){let v=storageGet(KEY_ACTIVE),a=[...BUILTINS,...loadProfiles()];return a.some(p=>p.id===v)?v:BUILTINS[0].id}
+function saveActive(){storageSet(KEY_ACTIVE,activeId)}
+
+function render(){
+ renderSelect();renderQuick();renderGrid();resetTimer(true);
+}
+function renderSelect(){
+ profileSelect.replaceChildren();
+ allProfiles().forEach(p=>{let o=document.createElement("option");o.value=p.id;o.textContent=(p.builtIn?"🔒 ":"")+p.name;profileSelect.append(o)});
+ profileSelect.value=allProfiles().some(p=>p.id===activeId)?activeId:BUILTINS[0].id;
+}
+function renderQuick(){
+ quickRow.replaceChildren();
+ let clear=document.createElement("section");clear.className="clearcard";
+ let b=document.createElement("button");b.className="danger";b.textContent="♻️ Alle Nummern löschen";b.title="Alle Nummern löschen. Notizen bleiben erhalten.";b.onclick=clearNumbers;clear.append(b);quickRow.append(clear);
+ active().quickCommands.forEach(q=>{
+  let card=document.createElement("section");card.className="quick";card.dataset.color=q.color||"";paint(card,q.color);
+  let l=document.createElement("div");l.className="qlabel";l.textContent=q.label;l.title="Doppelklick: Befehl kopieren";
+  let out=document.createElement("input");out.className="qout";out.value=q.command;out.readOnly=true;out.autocomplete="off";out.spellcheck=false;
+  let cp=document.createElement("button");cp.className="copy qcopy";cp.textContent="Copy";
+  let hd=document.createElement("button");hd.className="hd qhd";hd.textContent="HD";
+  let go=h=>copyQuick(q.command,h,card);l.ondblclick=()=>go(false);out.ondblclick=()=>go(false);cp.onclick=()=>go(false);hd.onclick=()=>go(true);
+  card.append(l,out,cp,hd);quickRow.append(card);
+ });
+}
+function renderGrid(){
+ grid.replaceChildren();
+ active().columns.forEach(c=>{
+  let col=document.createElement("section");col.className="column";col.dataset.columnId=c.id;
+  let head=document.createElement("div");head.className="chead";
+  let h=document.createElement("h2");h.textContent=c.title;
+  let x=document.createElement("button");x.className="cclear";x.textContent="♻️";x.title="Spalte leeren";x.onclick=()=>clearColumn(c.id);head.append(h,x);
+  let input=document.createElement("input");input.className="number";input.maxLength=10;input.placeholder=c.placeholder||"10 Zeichen";input.autocomplete="off";input.spellcheck=false;
+  let inf=document.createElement("div");inf.className="info";let a=document.createElement("span");a.textContent="Max. 10 Zeichen";let cnt=document.createElement("span");cnt.textContent="0 / 10";inf.append(a,cnt);
+  let list=document.createElement("div");list.className="commands";
+  c.commands.forEach(cmd=>{
+   let row=document.createElement("div");row.className="cmd";row.dataset.color=cmd.color||"";paint(row,cmd.color);
+   let label=document.createElement("div");label.className="clabel";label.textContent=cmd.label;label.title="Doppelklick: Befehl kopieren";
+   let controls=document.createElement("div");controls.className="controls";
+   let out=document.createElement("input");out.className="cout";out.dataset.prefix=cmd.prefix;out.placeholder=cmd.prefix+"...";out.readOnly=true;out.autocomplete="off";out.spellcheck=false;
+   let cp=document.createElement("button");cp.className="copy";cp.textContent="Copy";let hd=document.createElement("button");hd.className="hd";hd.textContent="HD";
+   let go=h=>copyGenerated(out,h,row);label.ondblclick=()=>go(false);out.ondblclick=()=>go(false);cp.onclick=()=>go(false);hd.onclick=()=>go(true);
+   controls.append(out,cp,hd);row.append(label,controls);list.append(row);
+  });
+  input.oninput=()=>{input.value=workValue(input.value);updateColumn(col,input.value);resetTimer(true)};input.onfocus=()=>input.select();input.onclick=()=>input.select();
+  col.append(head,input,inf,list);grid.append(col);
+ });
+}
+function workValue(v){return String(v||"").trim().slice(0,10)}
+function updateColumn(col,v){v=workValue(v);let cnt=col.querySelector(".info span:last-child");if(cnt)cnt.textContent=v.length+" / 10";col.querySelectorAll(".cout").forEach(o=>o.value=v?o.dataset.prefix+v:"")}
+function clearColumn(cid){let col=[...grid.children].find(x=>x.dataset.columnId===cid);if(!col)return;let input=col.querySelector(".number");input.value="";updateColumn(col,"");resetTimer(true);setStatus(col.querySelector("h2").textContent+" geleert.","warning")}
+async function copyText(t){if(!t){setStatus("Nichts zu kopieren.","warning");return false}try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(t);else fallback(t);setStatus("Kopiert: "+t,"success");return true}catch{try{fallback(t);setStatus("Kopiert: "+t,"success");return true}catch{setStatus("Kopieren fehlgeschlagen.","error");return false}}}
+function fallback(t){let a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.left="-9999px";document.body.append(a);a.select();document.execCommand("copy");a.remove()}
+async function copyGenerated(o,h,row){if(!o.value){setStatus("Erst Nummer einfügen.","warning");return}let t=h?"hd"+o.value:o.value;if(await copyText(t)){flash(row);resetTimer(true)}}
+async function copyQuick(c,h,row){let t=h?"hd"+c:c;if(await copyText(t)){flash(row);resetTimer(true)}}
+function rgba(hex,a){hex=color(hex)||"#94a3b8";let n=parseInt(hex.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function accent(hex){hex=color(hex);if(!hex)return"";let n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255,m=isLight?.28:.42,t=isLight?0:255;return`rgb(${Math.round(r+(t-r)*m)},${Math.round(g+(t-g)*m)},${Math.round(b+(t-b)*m)})`}
+function paint(el,c){c=color(c);el.style.backgroundColor="";el.style.borderColor="";let l=el.querySelector(".clabel,.qlabel");if(l)l.style.color="";if(!c)return;el.style.backgroundColor=rgba(c,isLight?.12:.22);el.style.borderColor=rgba(c,.42);if(l)l.style.color=accent(c)}
+function repaint(){document.querySelectorAll(".cmd,.quick").forEach(x=>paint(x,x.dataset.color))}
+function flash(el){let c=color(el.dataset.color),bg=getComputedStyle(el).backgroundColor,bd=getComputedStyle(el).borderColor,hi=c?rgba(c,isLight?.32:.72):(isLight?"rgba(100,116,139,.20)":"rgba(148,163,184,.30)"),hb=c||"#94a3b8";if(el.animate)el.animate([{backgroundColor:bg,borderColor:bd},{backgroundColor:hi,borderColor:hb,offset:.32},{backgroundColor:bg,borderColor:bd}],{duration:620,easing:"ease-out"})}
+function setStatus(msg,type){clearTimeout(statusHandle);status.className="status"+(type?" "+type:"");statusText.textContent="Status: "+msg;statusHandle=setTimeout(()=>{status.className="status";statusText.innerHTML="<strong>Status:</strong> Bereit. · Doppelklick auf Befehl oder Bezeichnung = kopieren"},STATUS_DELAY)}
+function clearNotes(){$("notes").value="";setStatus("Notizen gelöscht.","warning")}
+function toggleTheme(){isLight=!isLight;document.body.classList.toggle("light",isLight);storageSet(KEY_THEME,isLight?"light":"dark");themeBtn.textContent=isLight?"🌙":"☀️";themeBtn.title=isLight?"Dunkle Darstellung einschalten":"Helle Darstellung einschalten";repaint();setStatus(isLight?"Helle Darstellung aktiviert.":"Dunkle Darstellung aktiviert.","success")}
+function applyTheme(){document.body.classList.toggle("light",isLight);themeBtn.textContent=isLight?"🌙":"☀️";themeBtn.title=isLight?"Dunkle Darstellung einschalten":"Helle Darstellung einschalten"}
+
+function timerSeconds(){return Math.min(60,Math.max(1,Number(active().autoClearMinutes)||10))*60}
+function left(){return Math.max(0,Math.ceil((deadline-Date.now())/1000))}
+function timerView(){let s=left(),m=Math.floor(s/60),r=s%60;$("timer").textContent=String(m).padStart(2,"0")+":"+String(r).padStart(2,"0");$("timerBox").classList.toggle("danger",s<=60)}
+function tick(){if(left()<=0){clearSensitive();setStatus("Nummern automatisch gelöscht.","warning")}else timerView()}
+function startTimer(){clearInterval(timerHandle);resetTimer(true);timerHandle=setInterval(tick,1000)}
+function resetTimer(silent=false){deadline=Date.now()+timerSeconds()*1000;timerView();if(!silent)setStatus("Timer zurückgesetzt.","success")}
+function clearSensitive(){document.querySelectorAll(".number").forEach(i=>{i.value="";let c=i.closest(".column");if(c)updateColumn(c,"")});resetTimer(true)}
+function clearNumbers(){clearSensitive();setStatus("Nummern gelöscht. Notizen bleiben erhalten.","warning")}
+
+function changeProfile(){activeId=profileSelect.value;saveActive();render();setStatus("Profil geladen: "+active().name,"success")}
+function editProfile(){editingBuiltin=!!active().builtIn;editing=clone(active());editing.builtIn=false;if(editingBuiltin){editing.id=id("user");editing.name+=" – Kopie"}openEditor()}
+function newProfile(){editingBuiltin=true;editing=clone(active());editing.id=id("user");editing.builtIn=false;editing.name="Mein Profil";openEditor()}
+function openEditor(){document.body.classList.add("editing");renderEditor()}
+function cancelEdit(){editing=null;editingBuiltin=false;document.body.classList.remove("editing");setStatus("Änderungen verworfen.","warning")}
+function saveEdit(){
+ if(!editing)return;editing.name=clean(profileName.value,60)||"Mein Profil";editing.autoClearMinutes=Math.min(60,Math.max(1,Math.round(Number(autoClear.value)||10)));
+ let n=normalize(editing,false);if(!n||!n.columns.length){setStatus("Profil kann nicht gespeichert werden.","error");return}n.id=editing.id;n.name=editing.name;n.builtIn=false;
+ let i=userProfiles.findIndex(p=>p.id===n.id);if(i>=0&&!editingBuiltin)userProfiles[i]=n;else userProfiles.push(n);saveProfiles();activeId=n.id;saveActive();editing=null;editingBuiltin=false;document.body.classList.remove("editing");render();setStatus("Profil gespeichert.","success")
+}
+function deleteProfile(){
+ let p=active(),i=userProfiles.findIndex(x=>x.id===p.id);if(i<0){setStatus("Standardprofile können nicht gelöscht werden.","warning");return}
+ if(!confirm(`Profil "${p.name}" wirklich löschen?`))return;userProfiles.splice(i,1);saveProfiles();activeId=BUILTINS[0].id;saveActive();editing=null;editingBuiltin=false;document.body.classList.remove("editing");render();setStatus("Profil gelöscht.","warning")
+}
+function renderEditor(){if(!editing)return;profileName.value=editing.name;autoClear.value=editing.autoClearMinutes;renderQuickEditor();renderColsEditor()}
+function renderQuickEditor(){
+ quickEditor.replaceChildren();editing.quickCommands.forEach((q,i)=>quickEditor.append(editorRow(q.label,q.command,q.color,v=>q.label=v,v=>q.command=v,v=>q.color=v,()=>move(editing.quickCommands,i,-1,renderQuickEditor),()=>move(editing.quickCommands,i,1,renderQuickEditor),()=>{editing.quickCommands.splice(i,1);renderQuickEditor()},"ecard")));
+ if(!editing.quickCommands.length){let d=document.createElement("div");d.className="info";d.textContent="Keine Schnellbefehle.";quickEditor.append(d)}
+}
+function renderColsEditor(){
+ columnsEditor.replaceChildren();editing.columns.forEach((c,ci)=>{
+  let card=document.createElement("section");card.className="ecard";let head=document.createElement("div");head.className="echead";
+  let name=input(c.title,"Spaltenname",v=>c.title=v,50),up=small("↑","Spalte nach links",()=>move(editing.columns,ci,-1,renderColsEditor)),down=small("↓","Spalte nach rechts",()=>move(editing.columns,ci,1,renderColsEditor)),del=small("🗑️","Spalte löschen",()=>{editing.columns.splice(ci,1);renderColsEditor()});head.append(name,up,down,del);
+  let list=document.createElement("div");c.commands.forEach((cmd,ki)=>list.append(editorRow(cmd.label,cmd.prefix,cmd.color,v=>cmd.label=v,v=>cmd.prefix=v,v=>cmd.color=v,()=>move(c.commands,ki,-1,renderColsEditor),()=>move(c.commands,ki,1,renderColsEditor),()=>{c.commands.splice(ki,1);renderColsEditor()})));
+  let add=document.createElement("button");add.className="add";add.textContent="➕";add.title="Befehl hinzufügen";add.onclick=()=>{c.commands.push({id:id("cmd"),label:"Neuer Befehl",prefix:"",color:null});renderColsEditor()};card.append(head,list,add);columnsEditor.append(card)
+ });
+}
+function input(value,placeholder,onchange,max=120){let i=document.createElement("input");i.className="einput";i.value=value;i.placeholder=placeholder;i.maxLength=max;i.oninput=()=>onchange(String(i.value??"").replace(/[\u0000-\u001f\u007f]/g,"").slice(0,max));return i}
+function editorRow(label,command,col,onLabel,onCommand,onColor,onUp,onDown,onDel,extra=""){
+ let row=document.createElement("div");row.className="erow "+extra,l=input(label,"Bezeichnung",onLabel,60),c=input(command,"Befehl",onCommand,120),colors=document.createElement("div");colors.className="colors";
+ let picker=document.createElement("input");picker.type="color";picker.className="cpick";picker.value=color(col)||"#94a3b8";picker.title="Eigene Farbe wählen";picker.oninput=()=>onColor(picker.value);
+ PALETTE.forEach(x=>{let b=document.createElement("button");b.className="swatch";b.style.background=x;b.title=x;b.onclick=()=>{onColor(x);picker.value=x};colors.append(b)});
+ let none=small("Ø","Keine Hervorhebung",()=>{onColor(null);picker.value="#94a3b8"}),eye=small("💧","Farbe vom Bildschirm aufnehmen",async()=>{if(!window.EyeDropper){setStatus("Pipette wird von diesem Browser nicht unterstützt.","warning");return}try{let r=await new EyeDropper().open(),x=color(r.sRGBHex);if(x){onColor(x);picker.value=x}}catch{}});colors.append(none,picker,eye);
+ row.append(l,c,colors,small("↑","Nach oben",onUp),small("↓","Nach unten",onDown),small("🗑️","Löschen",onDel));return row
+}
+function small(t,title,fn){let b=document.createElement("button");b.className="small";b.textContent=t;b.title=title;b.type="button";b.onclick=fn;return b}
+function move(a,i,d,renderFn){let j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];renderFn()}
+function addQuick(){if(!editing)return;editing.quickCommands.push({id:id("quick"),label:"Neuer Schnellbefehl",command:"",color:null});renderQuickEditor()}
+function addColumn(){if(!editing)return;editing.columns.push({id:id("col"),title:`Spalte ${editing.columns.length+1}`,placeholder:"10 Zeichen",commands:[]});renderColsEditor()}
+
+function payload(p){let n=normalize(p,false);n.id=p.id;n.name=p.name;n.builtIn=false;return{format:FORMAT,formatVersion:FORMAT_VERSION,appVersion:VERSION,exportedAt:new Date().toISOString(),profile:n}}
+function safeName(n){return(clean(n,50).replace(/[<>:"/\\|?*]+/g,"-").replace(/\s+/g,"-")||"DBD-Profil")}
+function download(name,text){let u=URL.createObjectURL(new Blob([text],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+async function shareProfile(){
+ let p=active(),text=JSON.stringify(payload(p),null,2),name=`DBD-Profil_${safeName(p.name)}.json`;
+ try{let f=new File([text],name,{type:"application/json"});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[f]}))){await navigator.share({title:`DBD-Assistent – ${p.name}`,text:"DBD-Assistent Profil",files:[f]});setStatus("Profil geteilt.","success");return}}catch(e){if(e&&e.name==="AbortError")return}
+ download(name,text);setStatus("Profil exportiert.","success")
+}
+async function importFile(file){
+ if(!file)return;try{if(file.size>1024*1024)throw Error("Datei zu groß.");let obj=JSON.parse(await file.text());if(!obj||obj.format!==FORMAT||obj.formatVersion!==FORMAT_VERSION)throw Error("Nicht unterstütztes Profilformat.");let n=normalize(obj.profile,true);if(!n||!n.columns.length)throw Error("Ungültiges Profil.");n.name=clean(n.name+" – Import",60);userProfiles.push(n);saveProfiles();activeId=n.id;saveActive();render();setStatus("Profil importiert.","success")}catch(e){setStatus(e.message||"Profil konnte nicht importiert werden.","error")}finally{profileImport.value=""}
+}
+function feedback(){let s=encodeURIComponent("DBD-Assistent Feedback"),b=encodeURIComponent("Fehler / Idee:\n\n\nWann tritt es auf?\n\n\nVerbesserungsvorschlag:\n\n");location.href=`mailto:${FEEDBACK}?subject=${s}&body=${b}`}
+
+profileSelect.onchange=changeProfile;profileImport.onchange=e=>importFile(e.target.files[0]);document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()});window.addEventListener("focus",tick);
+$("year").textContent=new Date().getFullYear();applyTheme();render();startTimer();
+</script>
 </body>
 </html>
